@@ -1,0 +1,6 @@
+feature,category,mean_abs_shap
+Pm,Global Feature,1.3279002
+backbone_atoms,Node Feature,0.7411678
+kier_flex,Node Feature,0.47379044
+LogP,Node Feature,0.4331259
+avg_branch_length,Node Feature,0.3393646

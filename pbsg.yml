@@ -1,0 +1,15 @@
+name: pbsg
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - rdkit>=2023.03
+  - numpy
+  - scipy
+  - networkx
+  - pandas
+  - pip
+  - pip:
+      - torch
+      - torch-geometric

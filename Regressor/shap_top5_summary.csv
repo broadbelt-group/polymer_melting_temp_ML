@@ -1,0 +1,6 @@
+feature,category,mean_abs_shap
+RotBonds,Node Feature,19.792227
+flexibility,Node Feature,14.437167
+LogP,Node Feature,7.3335843
+Pm,Global Feature,7.2856855
+Heteroatoms,Node Feature,6.265864
