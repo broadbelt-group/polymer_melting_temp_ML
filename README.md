@@ -101,5 +101,9 @@ included for full transparency.
 
 ## Citation
 
+> **Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation.**
+> Maya L. Milrod, Kevin M. Shebek, A. Nolan Wilson, Eugene Y.-X. Chen, Tobin J. Marks, and Linda J. Broadbelt.
+
+A DOI will be added upon publication.
 
 ---
