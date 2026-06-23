@@ -2,7 +2,7 @@
 
 Machine-learning pipeline for predicting polymer crystallizability (melting temperature classifier) and
 melting temperature *T*<sub>m</sub> (regressor) from polymer structure, using fixed
-fingerprints (Logistic Regression / Ridge Regression / Random Forest / XGBoost) and graph neural networks (GCN / GINE / GATv2) with a coarse-grained **polymer bead sequence graph (PBSG)** representation.
+fingerprints (Logistic Regression / Ridge Regression / Random Forest / XGBoost) and graph neural networks (GCN / GINE / GATv2) with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
 
 This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation")* and contains
 the main analysis pipeline.
