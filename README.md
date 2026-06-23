@@ -85,12 +85,11 @@ Both pipelines follow the same stage sequence. Run notebooks in numeric order fr
 **Splits are canonical artifacts.** The `random_stratified_splits_*.json` files
 define the exact train/val/test partitions used for all reported results — load
 these directly to reproduce the paper. `run_random_stratified.py` is the generator
-(provided for transparency); regenerating requires the recorded seed and will
+(provided for full transparency); regenerating requires the recorded seed and will
 otherwise produce a different partition.
 
 **Hyperparameters are fixed.** Selected HPs live in `best_hp_full.json` (classifier)
 and `best_hp_reg.json` (regressor). The Optuna search scripts (`optuna_*.py`) are
-included for transparency; HPs were run once and were **not** re-tuned after data
-corrections (a single-row fix does not change model selection).
+included for full transparency.
 
 ---
