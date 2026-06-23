@@ -1,8 +1,7 @@
 # Polymer Melting Temperature Prediction
 
 Machine-learning pipeline for predicting polymer crystallizability (melting temperature classifier) and
-melting temperature *T*<sub>m</sub> (regressor) from polymer structure, using fixed
-fingerprints (Logistic Regression / Ridge Regression / Random Forest / XGBoost) and graph neural networks (GCN / GINE / GATv2) with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
+melting temperature *T*<sub>m</sub> (regressor) from polymer structure with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
 
 This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation")* and contains
 the main analysis pipeline.
@@ -93,8 +92,14 @@ these directly to reproduce the paper. `run_random_stratified.py` is the generat
 (provided for full transparency); regenerating requires the recorded seed and will
 otherwise produce a different partition.
 
+
 **Hyperparameters are fixed.** Selected HPs live in `best_hp_full.json` (classifier)
 and `best_hp_reg.json` (regressor). The Optuna search scripts (`optuna_*.py`) are
 included for full transparency.
+
+---
+
+## Citation
+
 
 ---
