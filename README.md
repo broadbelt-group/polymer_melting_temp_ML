@@ -53,6 +53,11 @@ conda activate pbsg
 conda env create -f shap.yml
 conda activate shap
 ```
+This paper makes use of the **[PBSG](https://github.com/mmilrod/PBSG.git)** representation (which was developed for this project) and is installable at pypi:
+```
+pip install pbsg
+```
+
 ---
 
 ## Reproduction order
