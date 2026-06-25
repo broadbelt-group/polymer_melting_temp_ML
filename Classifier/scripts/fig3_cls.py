@@ -44,7 +44,7 @@ STEREO_COLORS = {
     "isotactic":    "#2C7BB6",
     "syndiotactic": "#ABD9E9",
     "atactic":      "#FDAE61",
-    "heterotactic": "#D7191C",
+    "stereo-irregular": "#D7191C",
     "achiral":      "#1A9641",
 }
 
@@ -211,7 +211,7 @@ def plot_confusion(model_name, color, label, suffix):
 
 def plot_subgroup_stereo():
     stereo_order = ["isotactic", "syndiotactic", "atactic",
-                    "heterotactic", "achiral"]
+                    "stereo-irregular", "achiral"]
     model_keys   = [("gine_pbsg", "GINE (PBSG)", COLOR_GINE),
                     ("xgb_fp_pooled_poly",  "XGB (poly)",  COLOR_XGB)]
 

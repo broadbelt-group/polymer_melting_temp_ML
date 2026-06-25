@@ -45,17 +45,17 @@ REP_COLORS_REG = {
     "SMILES+global": "#1F77B4",  
     "SMILES":        "#AEC6E8",  
 }
-#MODEL_ORDER = ["gatv2_pbsg", "xgb_fp_pooled_ru", "xgb_fp_pooled_poly"]
-MODEL_ORDER=    ["xgb_fp_ru",  "xgb_fp_pooled_ru", "gatv2_pbsg"]
+MODEL_ORDER = ["gatv2_pbsg", "xgb_fp_pooled_ru", "xgb_fp_pooled_poly"]
+#MODEL_ORDER=    ["xgb_fp_ru",  "xgb_fp_pooled_ru", "gatv2_pbsg"]
 
 STEREO_COLORS = {
     "isotactic":    "#2C7BB6",
     "syndiotactic": "#74ADD1",
     "atactic":      "#FDAE61",
-    "heterotactic": "#D7191C",
+    "stereo-irregular": "#D7191C",
     "achiral":      "#1A9641",
 }
-STEREO_ORDER = ["isotactic", "syndiotactic", "atactic", "heterotactic", "achiral"]
+STEREO_ORDER = ["isotactic", "syndiotactic", "atactic", "stereo-irregular", "achiral"]
 
 ARCH_COLORS = {
     "alternating": "#7B2D8B",
@@ -132,7 +132,7 @@ def plot_pred_vs_actual(preds, df_reg, test_idx):
                   np.sum((labels_arr - labels_arr.mean())**2)
         mae = np.mean(np.abs(labels_arr - preds_arr))
         ax.text(0.05, 0.95,
-                f"R² = {r2:.3f}\nMAE = {mae:.1f}°C",
+                f"R² = {r2:.2f}\nMAE = {mae:.1f}°C",
                 transform=ax.transAxes, fontsize=12,
                 va="top", ha="left",
                 bbox=dict(boxstyle="round,pad=0.3", fc="white",

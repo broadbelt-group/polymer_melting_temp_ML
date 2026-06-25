@@ -82,7 +82,7 @@ STEREO_COLORS = {
     "isotactic":    "#2C7BB6",
     "syndiotactic": "#ABD9E9",
     "atactic":      "#FDAE61",
-    "heterotactic": "#D7191C",
+    "stereo-irregular": "#D7191C",
     "achiral":      "#1A9641",
     "unknown":      "#AAAAAA",
 }
@@ -189,7 +189,7 @@ def plot_tsne_stereo(coords, df):
     stereo = df["stereo_class"].fillna("unknown").values
     colors = [STEREO_COLORS.get(s, "#AAAAAA") for s in stereo]
 
-    order = ["isotactic", "syndiotactic", "atactic", "heterotactic", "achiral"]
+    order = ["isotactic", "syndiotactic", "atactic", "stereo-irregular", "achiral"]
     _tsne_scatter(coords, colors, STEREO_COLORS,
                   "Chemical Space — Stereo Class",
                   f"{OUTDIR}/fig1d_tsne_stereo.pdf",

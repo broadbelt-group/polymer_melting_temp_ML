@@ -26,7 +26,7 @@ DESC_NAMES  = [
 ]
 ARCH_NAMES  = ["arch_alternating", "arch_block", "arch_random", "arch_homopolymer"]
 STEREO_NAMES = [
-    "stereo_isotactic", "stereo_syndiotactic", "stereo_heterotactic",
+    "stereo_isotactic", "stereo_syndiotactic", "stereo_stereo-irregular",
     "stereo_atactic", "stereo_achiral", "stereo_unknown",
 ]
 SEQ_NAMES   = ["Pm", "Px", "asym"]

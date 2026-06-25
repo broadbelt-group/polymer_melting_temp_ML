@@ -250,6 +250,7 @@ def plot_dov_reg(dov_reg, result_df_reg, test_results_reg,
                 float(np.mean(np.abs(labels[mask] - preds[mask])))
             )
         tier_colors.append(TIER_COLORS[tier])
+        print(tier_maes)
 
     x = np.arange(len(TIER_ORDER))
     bars = ax.bar(x, [v if not np.isnan(v) else 0 for v in tier_maes],

@@ -275,12 +275,12 @@ def plot_tsne_reg_tm(X_fp=None, df_reg=None,
         "isotactic":    "#2C7BB6",
         "syndiotactic": "#74ADD1",
         "atactic":      "#FDAE61",
-        "heterotactic": "#D7191C",
+        "stereo-irregular": "#D7191C",
         "achiral":      "#1A9641",
         "unknown":      "#AAAAAA",
     }
     STEREO_ORDER = ["isotactic", "syndiotactic", "atactic",
-                    "heterotactic", "achiral"]
+                    "stereo-irregular", "achiral"]
 
     fig, ax = plt.subplots(figsize=(5.0, 4.5))
     for s in STEREO_ORDER:

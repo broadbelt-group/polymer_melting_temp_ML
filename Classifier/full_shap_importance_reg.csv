@@ -54,7 +54,7 @@ morgan_fp_1002,0.018402794,Morgan Fingerprint
 morgan_fp_327,0.018326938,Morgan Fingerprint
 morgan_fp_599,0.01798218,Morgan Fingerprint
 stereo_syndiotactic,0.017933693,Stereochemistry
-stereo_heterotactic,0.017661806,Stereochemistry
+stereo_stereo-irregular,0.017661806,Stereochemistry
 morgan_fp_512,0.017381756,Morgan Fingerprint
 morgan_fp_904,0.016963044,Morgan Fingerprint
 arch_homopolymer,0.016796444,Architecture

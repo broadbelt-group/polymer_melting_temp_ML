@@ -27,7 +27,7 @@ asym,1.4363557,Global Feature
 morgan_fp_80,1.4302716,Morgan Fingerprint
 morgan_fp_266,1.3914365,Morgan Fingerprint
 morgan_fp_64,1.3805262,Morgan Fingerprint
-stereo_heterotactic,1.2396333,Stereochemistry
+stereo_stereo-irregular,1.2396333,Stereochemistry
 arch_homopolymer,1.1880417,Architecture
 HBD,1.0755675,Node Feature
 morgan_fp_6,0.9480684,Morgan Fingerprint

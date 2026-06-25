@@ -45,13 +45,13 @@ STEREO_COLORS = {
     "isotactic":    "#2C7BB6",
     "syndiotactic": "#ABD9E9",
     "atactic":      "#FDAE61",
-    "heterotactic": "#D7191C",
+    "stereo-irregular": "#D7191C",
     "achiral":      "#1A9641",
     "unknown":      "#AAAAAA",
 }
 
 STEREO_ORDER = ["isotactic", "syndiotactic", "atactic",
-                "heterotactic", "achiral"]
+                "stereo-irregular", "achiral"]
 
 plt.rcParams.update({
     "font.family":        "sans-serif",

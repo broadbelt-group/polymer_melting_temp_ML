@@ -35,10 +35,10 @@ STEREO_COLORS = {
     "isotactic":    "#2C7BB6",
     "syndiotactic": "#74ADD1",
     "atactic":      "#FDAE61",
-    "heterotactic": "#D7191C",
+    "stereo-irregular": "#D7191C",
     "achiral":      "#1A9641",
 }
-STEREO_ORDER = ["isotactic", "syndiotactic", "atactic", "heterotactic", "achiral"]
+STEREO_ORDER = ["isotactic", "syndiotactic", "atactic", "stereo-irregular", "achiral"]
 
 GNN_ROWS = ["GCN", "GINE", "GATV2"]
 CLS_ROWS = ["RR", "RF", "XGB"]

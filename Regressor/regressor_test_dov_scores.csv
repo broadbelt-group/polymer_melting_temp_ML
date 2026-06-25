@@ -8,7 +8,7 @@ smiles,stereo,dov_score,in_domain_chem,stereo_covered,in_domain_full,reliability
 [*]OC(COC(C)(C)C)C[*].[*]C(C(C=CC=C1)=C1C(O[*])=O)=O,atactic,0.7126,True,True,True,High
 [*]OCCCCCC([*])=O,achiral,0.7695,True,True,True,High
 [*]OC(CC)CC([*])=O,isotactic,0.9615,True,True,True,High
-[*]C(OC(C)=O)C[*],heterotactic,1.0,True,True,True,High
+[*]C(OC(C)=O)C[*],stereo-irregular,1.0,True,True,True,High
 [*]C(OC(C(C)(C)C)=O)C[*],atactic,0.9154,True,True,True,High
 [*]OC(C)CC([*])=O.[*]C(CCO[*])=O,isotactic,1.0,True,True,True,High
 ClC(C=C1)=CC=C1C([*])C[*],syndiotactic,0.6833,True,True,True,Moderate
@@ -35,10 +35,10 @@ FC(C=CC=C1)=C1C([*])C[*].[*]CC([*])C1=CC=CC=C1,syndiotactic,0.963,True,True,True
 CN(C(C([*])C[*])=O)C,isotactic,1.0,True,True,True,High
 [*]C(=O)CCCCCCCCCCCCC(=O)NCCCCCCN[*],achiral,0.7013,True,True,True,High
 [*]OC(CC(C)[*])=O.[*]C(CCCCCO[*])=O,isotactic,1.0,True,True,True,High
-[*]OC(CC(C)[*])=O,heterotactic,1.0,True,True,True,High
+[*]OC(CC(C)[*])=O,stereo-irregular,1.0,True,True,True,High
 CN(C)C(C=CC=C1)=C1CC([*])C[*].[*]C(C1=CC=CC=C1)C[*],syndiotactic,0.7805,True,True,True,High
 [*]OC(C)CC([*])=O,isotactic,1.0,True,True,True,High
-[*]C(CC(C(OCC1=CC=CC=C1)=O)O[*])=O,heterotactic,1.0,True,True,True,High
+[*]C(CC(C(OCC1=CC=CC=C1)=O)O[*])=O,stereo-irregular,1.0,True,True,True,High
 [*]OC(CC(C)[*])=O,syndiotactic,1.0,True,True,True,High
 [*]C(CC(C(OCC=C)=O)O[*])=O,syndiotactic,0.8323,True,True,True,High
 [*]C(C1=C(C(O[*])=O)C=CC=C1)=O.[*]C2COCC2O[*],isotactic,0.6382,True,True,True,Moderate
