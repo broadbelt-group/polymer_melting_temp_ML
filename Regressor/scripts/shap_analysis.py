@@ -1,10 +1,3 @@
-"""
-SHAP Top-5 Feature Importance Analysis
-=======================================
-- Works with any scikit-learn tree-based model (RandomForest, XGBoost, GradientBoosting, etc.)
-- Colors features by category on both bar and beeswarm plots
-- Saves publication-ready figures
-"""
 
 import numpy as np
 import pandas as pd
@@ -12,9 +5,7 @@ import shap
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-# ──────────────────────────────────────────────
 # 1. FEATURE DEFINITIONS
-# ──────────────────────────────────────────────
 
 FP_NAMES    = [f"morgan_fp_{i}" for i in range(1024)]
 DESC_NAMES  = [
@@ -44,20 +35,13 @@ feature_categories = (
 )
 
 
-# ──────────────────────────────────────────────
 # 2. PLUG IN YOUR MODEL AND DATA
-# ──────────────────────────────────────────────
 
 if "model" not in globals() or "X" not in globals():
     raise NameError("Set `model` and `X` in your notebook before calling %run shap_analysis.py")
 
 
-# mpl.rcParams['axes.prop_cycle'] = cycler(color=[
-#     '#5c3c8b', '#92c36d', '#ee9432', '#496391', '#85a5cd', '#FDF3CC'
-# ])
-# ──────────────────────────────────────────────
 # 3. CONFIGURATION
-# ──────────────────────────────────────────────
 
 TOP_N          = 5
 INTERPRETABLE_ONLY = True
@@ -100,9 +84,7 @@ DISPLAY_NAMES = {
 }
 
 
-# ──────────────────────────────────────────────
 # 4. COMPUTE SHAP VALUES
-# ──────────────────────────────────────────────
 
 if not isinstance(X, pd.DataFrame):
     X = pd.DataFrame(X, columns=ALL_NAMES[:X.shape[1]])
@@ -119,9 +101,7 @@ else:
     sv             = np.abs(shap_values.values)
     shap_values_2d = shap_values.values
 
-# ──────────────────────────────────────────────
 # 5. IDENTIFY TOP-N FEATURES
-# ──────────────────────────────────────────────
 
 mean_abs_shap = sv.mean(axis=0)
 feature_cols  = list(X.columns)
@@ -152,9 +132,7 @@ top5_names  = top5["feature"].tolist()
 top5_colors = top5["color"].tolist()
 present_cats = top5["category"].unique()
 
-# ──────────────────────────────────────────────
 # 6. PLOT 1 — BAR CHART
-# ──────────────────────────────────────────────
  
 fig, ax = plt.subplots(figsize=(6, 4))
  
@@ -178,18 +156,14 @@ for i, (bar, name, val) in enumerate(zip(bars, names_rev, values_rev)):
             fontsize=10, fontweight="bold", color="white",
             clip_on=False)
  
-ax.set_xlabel(r"Mean SHAP Value, ($T_m$)", fontsize=11) #, ($^{\circ}$C)
-#ax.set_title(f"Top {TOP_N} Most Important Features", fontsize=13, fontweight="bold")
+ax.set_xlabel(r"Mean SHAP Value, ($T_m$)", fontsize=11)
 ax.set_yticks([])                   # hide y-axis ticks — names are on bars
-#ax.spines[["top", "right", "left"]].set_visible(False)
 ax.set_xlim(0, x_max * 1.1)       # give room for outside labels
- 
+
 legend_handles = [
     mpatches.Patch(color=CATEGORY_COLORS.get(c, DEFAULT_COLOR), label=c)
     for c in present_cats
 ]
-# ax.legend(handles=legend_handles, fontsize=9,
-#           title_fontsize=9, loc="lower right")
  
 plt.tight_layout()
 bar_path = f"{FIGURE_DIR}/shap_top{TOP_N}_bar_reg.png"
@@ -197,9 +171,7 @@ plt.savefig(bar_path, dpi=DPI, bbox_inches="tight")
 plt.show()
 print(f"Saved: {bar_path}")
 
-# ──────────────────────────────────────────────
 # LEGEND — save as separate image
-# ──────────────────────────────────────────────
 
 fig_leg, ax_leg = plt.subplots(figsize=(3, len(CATEGORY_COLORS) * 0.4 + 0.3))
 ax_leg.axis("off")
@@ -210,7 +182,6 @@ legend_handles = [
 ]
 ax_leg.legend(
     handles       = legend_handles,
-    #title         = "Feature Category",
     title_fontsize = 10,
     fontsize      = 10,
     loc           = "center",
@@ -226,9 +197,7 @@ plt.show()
 print(f"Saved: {legend_path}")
 
 
-# ──────────────────────────────────────────────
 # 7. PLOT 2 — BEESWARM
-# ──────────────────────────────────────────────
 
 if MAKE_BEESWARM:
     shap_top5 = shap.Explanation(
@@ -266,9 +235,7 @@ if MAKE_BEESWARM:
     plt.show()
     print(f"Saved: {beeswarm_path}")
 
-# ──────────────────────────────────────────────
 # 8. EXPORT SUMMARY TABLE
-# ──────────────────────────────────────────────
 
 csv_path = f"{FIGURE_DIR}/shap_top{TOP_N}_summary_reg.csv"
 top5[["feature", "category", "mean_abs_shap"]].to_csv(csv_path, index=False)

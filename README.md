@@ -1,12 +1,10 @@
 # Polymer Melting Temperature Prediction
 
 Machine-learning pipeline for predicting polymer crystallizability (melting temperature classifier) and
-melting temperature *T*<sub>m</sub> (regressor) from polymer structure, using fixed
-fingerprints (Logistic Regression / Ridge Regression / Random Forest / XGBoost) and graph neural networks (GCN / GINE / GATv2) with a coarse-grained **polymer bead sequence graph (PBSG)** representation.
+melting temperature *T*<sub>m</sub> (regressor) from polymer structure with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
 
-This repository accompanies the manuscript *(Tm prediction, in prep.)* and contains
-the data, splits, code, trained models, and figure/table generation scripts needed
-to reproduce the reported results.
+This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation")* and contains
+the main analysis pipeline.
 
 ---
 
@@ -54,6 +52,11 @@ conda activate pbsg
 conda env create -f shap.yml
 conda activate shap
 ```
+This paper makes use of the **[PBSG](https://github.com/mmilrod/PBSG.git)** representation (which was developed for this project) and is installable at pypi:
+```
+pip install pbsg
+```
+
 ---
 
 ## Reproduction order
@@ -86,12 +89,21 @@ Both pipelines follow the same stage sequence. Run notebooks in numeric order fr
 **Splits are canonical artifacts.** The `random_stratified_splits_*.json` files
 define the exact train/val/test partitions used for all reported results — load
 these directly to reproduce the paper. `run_random_stratified.py` is the generator
-(provided for transparency); regenerating requires the recorded seed and will
+(provided for full transparency); regenerating requires the recorded seed and will
 otherwise produce a different partition.
+
 
 **Hyperparameters are fixed.** Selected HPs live in `best_hp_full.json` (classifier)
 and `best_hp_reg.json` (regressor). The Optuna search scripts (`optuna_*.py`) are
-included for transparency; HPs were run once and were **not** re-tuned after data
-corrections (a single-row fix does not change model selection).
+included for full transparency.
+
+---
+
+## Citation
+
+> **Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation.**
+> Maya L. Milrod, Kevin M. Shebek, A. Nolan Wilson, Eugene Y.-X. Chen, Tobin J. Marks, and Linda J. Broadbelt.
+
+A DOI will be added upon publication.
 
 ---

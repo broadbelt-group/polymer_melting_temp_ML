@@ -1,30 +1,9 @@
-"""
-fig1c_split_validation.py
-=========================
-Figure 1 Panel C — Split validation showing stratification worked.
-
-Two subplots side by side:
-  Left:  has_Tm % in Train+Val vs Test
-  Right: Stereo class % in Train+Val vs Test
-
-Saved as: fig1c_split_validation.pdf
-
-Usage
------
-  from fig1c_split_validation import plot_split_validation
-  plot_split_validation(df_cls, trainval_idx, test_idx)
-
-Requires: df_cls, trainval_idx, test_idx in notebook namespace
-"""
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 COLOR_TRAIN = "#2C7BB6"   # blue — train+val
 COLOR_TEST  = "#D7191C"   # red  — test

@@ -1,22 +1,3 @@
-"""
-test_evaluation.py
-==================
-Final held-out test set evaluation for ALL classification model/rep combinations:
-  GNN  (9): GCN, GINE, GATv2 × {PBSG, SMILES, SMILES+global}
-  Classical (12): LR, RF, XGB × {FP+pooled RU, FP RU, FP+pooled poly, FP poly}
-
-HPs loaded from best_hp_full.json.
-
-Usage
------
-  from test_evaluation import run_all_test
-  test_results = run_all_test(
-      graphs_PBSG, graphs_SMILES, graphs_SMILES_gl,
-      X_fp_pooled_RU, X_fp_RU, X_fp_pooled_poly, X_fp_poly,
-      y, df, trainval_idx, test_idx, device,
-      hp_path="best_hp_full.json",
-  )
-"""
 
 import json
 import os
@@ -39,12 +20,9 @@ from scripts.CV import (
 )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # LOAD TUNED HPs FROM JSON
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _load_gnn_hp(hp_dict, key):
-    """Convert JSON GNN entry to (SimpleNamespace args, int seed)."""
     hp = hp_dict[key]
     args = SimpleNamespace(
         hidden       = hp["hidden"],
@@ -60,7 +38,6 @@ def _load_gnn_hp(hp_dict, key):
 
 
 def _build_classical(hp_dict, key, scale_pos_weight=1.0):
-    """Build classical classifier from JSON HP entry."""
     hp         = hp_dict[key]
     model_name = hp["model"]
     if model_name == "lr":
@@ -98,9 +75,7 @@ def _build_classical(hp_dict, key, scale_pos_weight=1.0):
     raise ValueError(f"Unknown model: {model_name}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PRINT HELPERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _print_metrics(name, metrics):
     print(f"\n{'='*60}")
@@ -123,13 +98,10 @@ def _print_subgroups(subgroups):
                   f"{m['acc']:>8.4f} {m['f1']:>8.4f}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN TEST EVALUATION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def evaluate_gnn_test(arch, graphs, trainval_idx, test_idx, df,
                       device, args, seed, name):
-    """Retrain GNN classifier on full trainval, evaluate on test."""
     set_seed(seed)
     in_ch, edge_dim, meta_dim = _graph_dims(graphs)
 
@@ -173,12 +145,9 @@ def evaluate_gnn_test(arch, graphs, trainval_idx, test_idx, df,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSICAL TEST EVALUATION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def evaluate_classical_test(X, y, trainval_idx, test_idx, df, clf, name):
-    """Retrain classical classifier on full trainval, evaluate on test."""
     print(f"\n── {name} ──────────────────────────────────────────")
 
     t0             = time.time()
@@ -204,23 +173,13 @@ def evaluate_classical_test(X, y, trainval_idx, test_idx, df, clf, name):
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # RUN ALL
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_all_test(graphs_PBSG, graphs_SMILES, graphs_SMILES_gl,
                  X_fp_pooled_RU, X_fp_RU, X_fp_pooled_poly, X_fp_poly,
                  y, df, trainval_idx, test_idx, device,
                  hp_path="best_hp_full.json",
                  save_dir="saved_models_all"):
-    """
-    Run test evaluation for all 21 classification model/rep combinations.
-
-    Parameters
-    ----------
-    hp_path  : path to best_hp_full.json from Optuna tuning
-    save_dir : directory to save best models
-    """
     trainval_idx = np.array(trainval_idx)
     test_idx     = np.array(test_idx)
 

@@ -1,25 +1,3 @@
-"""
-fig3_classification.py
-======================
-Figure 3 panels for classification results.
-
-Panels (saved as separate files for PowerPoint assembly):
-  fig3a_roc_gine.pdf       — ROC curve, GINE (PBSG) tuned
-  fig3a_roc_xgb.pdf        — ROC curve, XGB (FP+pooled poly) tuned
-  fig3b_pr_gine.pdf        — PR curve, GINE (PBSG) tuned
-  fig3b_pr_xgb.pdf         — PR curve, XGB (FP+pooled poly) tuned
-  fig3c_cm_gine.pdf        — Confusion matrix, GINE
-  fig3c_cm_xgb.pdf         — Confusion matrix, XGB (poly)
-  fig3d_subgroup_stereo.pdf — F1 by stereo class, both models
-  fig3e_subgroup_arch.pdf  — F1 by copolymer architecture, both models
-
-Usage
------
-  python fig3_classification.py
-  # or in notebook:
-  %run fig3_classification.py
-"""
-
 import json
 import numpy as np
 import pandas as pd
@@ -31,12 +9,11 @@ from sklearn.metrics import (
     average_precision_score,
 )
 
-# ══════════════════════════════════════════════════════════════════════════════
-# COLORS — change these to match your paper palette
-# ══════════════════════════════════════════════════════════════════════════════
 
-COLOR_GINE   =  "#BD2D87"   # blue
-COLOR_XGB    = "#ff7f0e"   # red
+# COLORS 
+
+COLOR_GINE   =  "#BD2D87"   # pink
+COLOR_XGB    = "#ff7f0e"   # orange
 COLOR_RANDOM = "#AAAAAA"   # grey for random baseline
 
 # Stereo class colors
@@ -64,19 +41,19 @@ plt.rcParams.update({
     "axes.spines.right":  True,
     "xtick.direction": "out",
     "ytick.direction": "out",
-    "pdf.fonttype":    42,   # editable text in Illustrator/PowerPoint
+    "pdf.fonttype":    42,   
     "svg.fonttype":    "none",
 })
 
-FIG_W  = 3.5   # single panel width (inches) — adjust for journal
+FIG_W  = 3.5   
 FIG_H  = 3.2
 DPI    = 300
-OUTDIR = "Figures"   # change to output directory if needed
+OUTDIR = "Figures"   
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+
 # LOAD DATA
-# ══════════════════════════════════════════════════════════════════════════════
+
 
 with open("test_predictions-full.json") as f:
     preds = json.load(f)
@@ -99,9 +76,7 @@ def _get(model_name, key):
     return np.array(preds[mk][key])
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PANEL A — ROC CURVES (one per model)
-# ══════════════════════════════════════════════════════════════════════════════
+# ROC CURVES (one per model)
 
 def plot_roc(model_name, color, label, suffix):
     labels = _get(model_name, "labels")
@@ -127,9 +102,7 @@ def plot_roc(model_name, color, label, suffix):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PANEL B — PR CURVES (one per model)
-# ══════════════════════════════════════════════════════════════════════════════
+# PR CURVES (one per model)
 
 def plot_pr(model_name, color, label, suffix):
     labels = _get(model_name, "labels")
@@ -156,9 +129,8 @@ def plot_pr(model_name, color, label, suffix):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PANEL C — CONFUSION MATRICES (one per model)
-# ══════════════════════════════════════════════════════════════════════════════
+# CONFUSION MATRICES (one per model)
+
 from matplotlib.colors import LinearSegmentedColormap
 
 def make_cmap(base_color):
@@ -197,7 +169,6 @@ def plot_confusion(model_name, color, label, suffix):
         ax.set_title("XGB (PolyFP+pooled)", fontsize=16, fontweight="bold")
     else: 
         ax.set_title(f"{label}", fontsize=16, fontweight="bold")
-    #plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     fig.tight_layout()
     path = f"{OUTDIR}/fig3c_cm_{suffix}.pdf"
     fig.savefig(path, dpi=DPI, bbox_inches="tight")
@@ -205,9 +176,7 @@ def plot_confusion(model_name, color, label, suffix):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PANEL D — SUBGROUP F1 BY STEREO CLASS
-# ══════════════════════════════════════════════════════════════════════════════
+# SUBGROUP F1 BY STEREO CLASS
 
 def plot_subgroup_stereo():
     stereo_order = ["isotactic", "syndiotactic", "atactic",
@@ -245,7 +214,6 @@ def plot_subgroup_stereo():
     ax.set_ylim(0, 1.12)
     ax.set_title("F1 by Stereo Class", fontsize=11, fontweight="bold")
     ax.legend(frameon=False, fontsize=9)
-    #ax.axhline(1.0, color="grey", lw=0.8, linestyle="--", alpha=0.5)
     fig.tight_layout()
     path = f"{OUTDIR}/fig3d_subgroup_stereo.pdf"
     fig.savefig(path, dpi=DPI, bbox_inches="tight")
@@ -253,9 +221,7 @@ def plot_subgroup_stereo():
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PANEL E — SUBGROUP F1 BY COPOLYMER ARCHITECTURE
-# ══════════════════════════════════════════════════════════════════════════════
+# SUBGROUP F1 BY COPOLYMER ARCHITECTURE
 
 def plot_subgroup_arch():
     arch_order = ["alternating", "block", "random"]
@@ -290,7 +256,6 @@ def plot_subgroup_arch():
     ax.set_ylim(0, 1.12)
     ax.set_title("F1 by Copolymer Architecture", fontsize=11, fontweight="bold")
     ax.legend(frameon=False, fontsize=9)
-    #ax.axhline(1.0, color="grey", lw=0.8, linestyle="--", alpha=0.5)
     fig.tight_layout()
     path = f"{OUTDIR}/fig3e_subgroup_arch.pdf"
     fig.savefig(path, dpi=DPI, bbox_inches="tight")
@@ -298,9 +263,7 @@ def plot_subgroup_arch():
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # RUN ALL
-# ══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     for model_name, (mk, color, label) in MODELS.items():

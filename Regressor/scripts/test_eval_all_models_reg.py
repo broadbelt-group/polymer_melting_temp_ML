@@ -1,22 +1,3 @@
-"""
-test_evaluation_reg.py
-======================
-Final held-out test set evaluation for ALL regression model/rep combinations:
-  GNN  (9): GCN, GINE, GATv2 × {PBSG, SMILES, SMILES+global}
-  Classical (12): RR, RF, XGB × {FP+pooled RU, FP RU, FP+pooled poly, FP poly}
-
-HPs loaded from best_hp_reg.json.
-
-Usage
------
-  from test_evaluation_reg import run_all_test_reg
-  test_results_reg = run_all_test_reg(
-      graphs_PBSG, graphs_SMILES, graphs_SMILES_gl,
-      X_fp_pooled_RU, X_fp_RU, X_fp_pooled_poly, X_fp_poly,
-      y, df_reg, trainval_idx_reg, test_idx_reg, device,
-      hp_path="best_hp_reg.json",
-  )
-"""
 
 import json
 import os
@@ -41,12 +22,9 @@ from scripts.CV import (
 )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # LOAD TUNED HPs FROM JSON
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _load_gnn_hp(hp_dict, key):
-    """Convert JSON GNN entry to (SimpleNamespace args, int seed)."""
     hp = hp_dict[key]
     args = SimpleNamespace(
         hidden       = hp["hidden"],
@@ -62,7 +40,6 @@ def _load_gnn_hp(hp_dict, key):
 
 
 def _build_classical(hp_dict, key):
-    """Build classical model from JSON HP entry."""
     hp         = hp_dict[key]
     model_name = hp["model"]
     if model_name == "rr":
@@ -91,9 +68,7 @@ def _build_classical(hp_dict, key):
     raise ValueError(f"Unknown model: {model_name}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # METRICS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def full_metrics_reg(labels, preds):
     mae     = float(mean_absolute_error(labels, preds))
@@ -125,13 +100,10 @@ def _print_subgroups(subgroups):
                   f"{m['mae']:>8.2f} {m['rmse']:>8.2f} {m['r2']:>8.4f}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN TEST EVALUATION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def evaluate_gnn_test_reg(arch, graphs, trainval_idx, test_idx,
                            df, device, args, seed, name):
-    """Retrain GNN regressor on full trainval, evaluate on test."""
     set_seed(seed)
     in_ch, edge_dim, meta_dim = _graph_dims(graphs)
 
@@ -179,13 +151,10 @@ def evaluate_gnn_test_reg(arch, graphs, trainval_idx, test_idx,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSICAL TEST EVALUATION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def evaluate_classical_test_reg(X, y, trainval_idx, test_idx,
                                  df, clf, name):
-    """Retrain classical regressor on full trainval, evaluate on test."""
     print(f"\n── {name} ──────────────────────────────────────────")
 
     X_scaler = StandardScaler()
@@ -211,23 +180,13 @@ def evaluate_classical_test_reg(X, y, trainval_idx, test_idx,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # RUN ALL
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_all_test_reg(graphs_PBSG, graphs_SMILES, graphs_SMILES_gl,
                      X_fp_pooled_RU, X_fp_RU, X_fp_pooled_poly, X_fp_poly,
                      y, df_reg, trainval_idx, test_idx, device,
                      hp_path="best_hp_reg.json",
                      save_dir="saved_models_all"):
-    """
-    Run test evaluation for all 21 regression model/rep combinations.
-
-    Parameters
-    ----------
-    hp_path  : path to best_hp_reg.json
-    save_dir : directory to save best models (GINE PBSG + XGB pooled)
-    """
     trainval_idx = np.array(trainval_idx)
     test_idx     = np.array(test_idx)
 
@@ -283,7 +242,6 @@ def run_all_test_reg(graphs_PBSG, graphs_SMILES, graphs_SMILES_gl,
 
     # ── Summary table sorted by R² ────────────────────────────────────────────
     metric_keys = ["MAE", "RMSE", "R²", "MAPE (%)", "train_time_min"]
-    #metric_keys = ["MAE", "RMSE", "R²", "MAPE (%)"]
     col_w = 13
     sep   = "=" * (32 + col_w * len(metric_keys))
 

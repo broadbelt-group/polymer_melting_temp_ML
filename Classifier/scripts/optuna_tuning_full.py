@@ -1,41 +1,3 @@
-"""
-optuna_tuning_full_cls.py
-=========================
-Full HP tuning for ALL 27 classification model/rep combinations
-with layers as a tunable hyperparameter.
-
-Saves to optuna_tuning_full.db (separate from original optuna_tuning.db).
-Best HPs saved to best_hp_full.json.
-
-Models tuned:
-  GNNs (3 archs × 3 reps = 9):
-    GCN, GINE, GATv2 × PBSG, SMILES, SMILES+global
-
-  Classical (3 models × 6 reps = 18):
-    LR, RF, XGB × FP+pooled RU, FP+pooled poly, FP RU, FP poly,
-                  FP SMILES, FP SMILES+global
-
-Objective: mean_auprc - 0.5 * std_auprc
-
-Resumable: all studies persist to optuna_tuning_full.db via SQLite.
-
-Usage
------
-  from optuna_tuning_full_cls import tune_all_cls
-  tune_all_cls(
-      graphs_PBSG      = graphs_PBSG,
-      graphs_SMILES    = graphs_SMILES,
-      graphs_SMILES_gl = graphs_SMILES_gl,
-      X_fp_pooled_RU   = X_fp_pooled_RU,
-      X_fp_pooled_poly = X_fp_pooled_poly,
-      X_fp_RU          = X_fp_RU,
-      X_fp_poly        = X_fp_poly,
-      X_fp_SMILES      = X_fp_SMILES,
-      X_fp_SMILES_gl   = X_fp_SMILES_gl,
-      y=y, folds=folds, df=df, device=device,
-      n_trials=30,
-  )
-"""
 
 import json
 import warnings
@@ -62,9 +24,7 @@ HP_PATH = "best_hp_full.json"
 SEED_CANDIDATES = [0, 1, 2, 3, 4, 10, 42]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # HELPERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _load_hp():
     try:
@@ -108,12 +68,9 @@ def _run_study(study_name, objective, n_trials):
     return study
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # SEARCH SPACES
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _suggest_gnn_hp(trial):
-    """GNN HP search space — layers free."""
     return SimpleNamespace(
         hidden       = trial.suggest_categorical("hidden_dim", [64, 128, 256]),
         layers       = trial.suggest_int("layers", 2, 5),
@@ -141,9 +98,7 @@ def _suggest_xgb_hp(trial):
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # OBJECTIVES
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _gnn_objective(arch, graphs, folds, device):
     in_ch, edge_dim, meta_dim = _graph_dims(graphs)
@@ -252,9 +207,7 @@ def _xgb_objective(X, y, folds):
     return objective
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # HP EXTRACTORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _hp_from_gnn_study(study, arch, rep):
     p = study.best_trial.params
@@ -309,9 +262,7 @@ def _hp_from_xgb_study(study):
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # MAIN
-# ══════════════════════════════════════════════════════════════════════════════
 
 def tune_all_cls(
     graphs_PBSG,
@@ -352,7 +303,7 @@ def tune_all_cls(
         hp[hp_key] = _hp_from_gnn_study(study, arch, rep)
         _save_hp(hp)
 
-    # ── LR (6 reps) ───────────────────────────────────────────────────────────
+    # ── LR (4 reps) ───────────────────────────────────────────────────────────
     lr_jobs = [
         ("cls_lr_fp_pooled_ru",   X_fp_pooled_RU,   "lr_fp_pooled_ru",   "FP+pooled RU"),
         ("cls_lr_fp_pooled_poly", X_fp_pooled_poly, "lr_fp_pooled_poly", "FP+pooled poly"),
@@ -367,7 +318,7 @@ def tune_all_cls(
         hp[hp_key]["rep"] = rep
         _save_hp(hp)
 
-    # ── RF (6 reps) ───────────────────────────────────────────────────────────
+    # ── RF (4 reps) ───────────────────────────────────────────────────────────
     rf_jobs = [
         ("cls_rf_fp_pooled_ru",   X_fp_pooled_RU,   "rf_fp_pooled_ru",   "FP+pooled RU"),
         ("cls_rf_fp_pooled_poly", X_fp_pooled_poly, "rf_fp_pooled_poly", "FP+pooled poly"),
@@ -382,7 +333,7 @@ def tune_all_cls(
         hp[hp_key]["rep"] = rep
         _save_hp(hp)
 
-    # ── XGB (6 reps) ──────────────────────────────────────────────────────────
+    # ── XGB (4 reps) ──────────────────────────────────────────────────────────
     xgb_jobs = [
         ("cls_xgb_fp_pooled_ru",   X_fp_pooled_RU,   "xgb_fp_pooled_ru",   "FP+pooled RU"),
         ("cls_xgb_fp_pooled_poly", X_fp_pooled_poly, "xgb_fp_pooled_poly", "FP+pooled poly"),
@@ -409,7 +360,6 @@ def load_best_hp(path=HP_PATH):
 
 
 def print_study_summary(n_top=3):
-    """Print top trials for all studies in the DB."""
     import optuna
     storage = optuna.storages.RDBStorage(DB)
     studies = optuna.get_all_study_summaries(storage=DB)

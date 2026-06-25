@@ -1,34 +1,3 @@
-"""
-run_random_stratified.py
-========================
-Random stratified train/val/test split for polymer Tm classification.
-
-Strategy
---------
-No group enforcement — polymers sharing repeat units CAN appear on both
-sides of the train/test boundary. This is an interpolation split: the
-model is evaluated on familiar chemistry in novel stereo/regio/sequence
-contexts.
-
-Stratification label: polymer_class | stereo_class | has_Tm
-  - polymer_class: SMARTS-derived (polyolefin, polyester, polyether,
-                   polyamide, polycarbonate, polyurethane, mixed, other)
-  - stereo_class:  from dataframe column
-  - has_Tm:        classification label
-
-Progressive fallback (applied per stratum before splitting):
-  Level 0 (target): class|stereo|label         — 48 strata
-  Level 1 (fallback if n < N_FOLDS+1): class|label    — 12 strata
-  Level 2 (last resort):               label only     —  2 strata
-
-Split structure
----------------
-  15% held-out test  →  StratifiedShuffleSplit (single draw, seed-searchable)
-  85% train+val      →  StratifiedKFold 5-fold (no groups)
-
-Output: JSON with same schema as existing splits
-  {"test": [...], "folds": [{"train": [...], "val": [...]}, ...]}
-"""
 
 import json
 import warnings
@@ -159,21 +128,6 @@ def run_random_stratified(
     seed: int         = 42,
     verbose: bool     = True,
 ) -> dict:
-    """
-    Build a random stratified train/val/test split.
-
-    Parameters
-    ----------
-    df          : cleaned dataframe (df_cls, 643 rows)
-    output_file : path to save JSON
-    seed        : random seed (use seed_search_random_stratified to find a
-                  good one if label coverage in test is unsatisfactory)
-    verbose     : print diagnostics
-
-    Returns
-    -------
-    dict with keys "test" and "folds", matching existing split JSON schema.
-    """
     n = len(df)
     idx_all = np.arange(n)
 
@@ -257,13 +211,6 @@ def seed_search_random_stratified(
     output_file: str = OUTPUT_FILE,
     verbose: bool   = True,
 ) -> int:
-    """
-    Search seeds 0..n_seeds-1 and return the best one.
-
-    Scoring: penalise seeds where any polymer class or stereo class
-    present in train is missing from test. Among clean seeds, prefer
-    the one with has_Tm fraction in test closest to the global fraction.
-    """
     strat     = _build_strat_labels(df)
     poly_cls  = assign_polymer_classes(df).values
     stereo    = df[COLS["stereo"]].fillna("unknown").values

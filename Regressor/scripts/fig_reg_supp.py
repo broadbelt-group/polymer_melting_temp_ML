@@ -1,22 +1,3 @@
-"""
-fig_reg_supplementary.py
-========================
-Additional regression figures:
-
-  fig_reg_split_validation.pdf  — Tm distribution + stereo balance train vs test
-  fig2a_cv_heatmap_gnn_reg.pdf  — GNN CV R² heatmap (regression)
-  fig2a_cv_heatmap_cls_reg.pdf  — Classical CV R² heatmap (regression)
-
-Usage
------
-  from fig_reg_supplementary import (
-      plot_reg_split_validation,
-      plot_reg_cv_heatmaps,
-  )
-
-  plot_reg_split_validation(df_reg, trainval_idx_reg, test_idx_reg)
-  plot_reg_cv_heatmaps()   # requires cv_results_reg.csv
-"""
 
 import numpy as np
 import pandas as pd
@@ -24,9 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from scipy.stats import gaussian_kde
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 COLOR_TRAIN = "#2C7BB6"
 COLOR_TEST  = "#D7191C"
@@ -80,16 +59,9 @@ DPI    = 300
 OUTDIR = "Figures"
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # REGRESSION SPLIT VALIDATION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_reg_split_validation(df, trainval_idx, test_idx):
-    """
-    Two-panel split validation for regression:
-      Left:  Tm distribution KDE + histogram, train vs test
-      Right: Stereo class % train vs test grouped bar
-    """
     trainval_idx = np.array(trainval_idx)
     test_idx     = np.array(test_idx)
 
@@ -130,7 +102,7 @@ def plot_reg_split_validation(df, trainval_idx, test_idx):
     ax.set_title("T$_m$ Distribution", fontsize=10, fontweight="bold")
     ax.legend(frameon=False, fontsize=8.5)
 
-    # ── RIGHT: Stereo class bar ───────────────────────────────────────────────
+    # ── MIDDLE: Stereo class bar ─────────────────────────────────────────────
     ax = axes[1]
     n_stereo = len(STEREO_ORDER)
     bar_w    = 0.35
@@ -212,9 +184,7 @@ def plot_reg_split_validation(df, trainval_idx, test_idx):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # REGRESSION CV HEATMAPS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _heatmap(pivot, pivot_std, row_order, col_order,
              title, outpath, n_graph_reps=0):
@@ -251,7 +221,6 @@ def _heatmap(pivot, pivot_std, row_order, col_order,
     ax.set_yticklabels(row_order, fontsize=10, fontweight="bold")
     ax.set_xlabel("Representation", fontsize=10, labelpad=8)
     ax.set_ylabel("Model", fontsize=10, labelpad=8)
-    #ax.set_title(title, fontsize=11, fontweight="bold", pad=12)
 
     if n_graph_reps > 0 and n_graph_reps < n_cols:
         ax.axvline(n_graph_reps - 0.5, color="white", lw=3)
@@ -264,10 +233,6 @@ def _heatmap(pivot, pivot_std, row_order, col_order,
         ax.axvline(pair_end - 0.5, color="white", lw=1.5)
         ax.axvline(pair_end - 0.5, color="lightgrey", lw=0.7,
                    linestyle=":", alpha=0.8)
-
-    # cbar = plt.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
-    # cbar.set_label("Mean R² (5-fold CV)", fontsize=9)
-    # cbar.ax.tick_params(labelsize=8)
 
     fig.tight_layout()
     fig.savefig(outpath, dpi=DPI, bbox_inches="tight")

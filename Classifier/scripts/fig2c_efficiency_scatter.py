@@ -1,29 +1,12 @@
-"""
-fig2c_gnn_efficiency.py
-=======================
-Figure 2 Panel C — GNN efficiency scatter.
-x = training time (minutes), y = mean AUPRC
-9 points: 3 models × 3 graph representations
-
-Color = representation (PBSG/SMILES+global/SMILES) — clearly distinct
-Marker = model (GCN/GINE/GATv2) — shape encodes model
-Labels = short, manually offset to avoid overlap
-x-axis = linear minutes
-
-Saved as: fig2c_gnn_efficiency.pdf
-
-Requires: cv_results.csv
-"""
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 
-# ══════════════════════════════════════════════════════════════════════════════
-# COLORS & MARKERS — rep gets color, model gets shape
-# ══════════════════════════════════════════════════════════════════════════════
+
+# COLORS and MARKERS 
+
 
 REP_COLORS = {
     "PBSG":          "#C5407E",   
@@ -58,9 +41,9 @@ DPI    = 300
 OUTDIR = "Figures"
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# LOAD & PARSE
-# ══════════════════════════════════════════════════════════════════════════════
+
+# LOAD and PARSE
+
 
 df = pd.read_csv("cv_results_full.csv")
 df["model"] = df["name"].str.extract(r"^(.+?)\s*\(")[0].str.strip().str.upper()
@@ -74,9 +57,7 @@ df_gnn = df[
 df_gnn["time_min"] = df_gnn["time_s"] / 60
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PLOT
-# ══════════════════════════════════════════════════════════════════════════════
 
 fig, ax = plt.subplots(figsize=(6.0, 4.5))
 
@@ -93,11 +74,9 @@ for _, row in df_gnn.iterrows():
                zorder=4)
 
 
-# ── Axes ──────────────────────────────────────────────────────────────────────
+# Axes 
 ax.set_xlabel("Training Time (minutes, 5-fold CV)", fontsize=14)
 ax.set_ylabel("Mean AUPRC (5-fold CV)", fontsize=14)
-#ax.set_title("GNN Performance vs Training Time", fontsize=11, fontweight="bold")
-
 # Linear x-axis with clean ticks
 ax.set_xlim(left=0)
 ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0f}"))
@@ -110,7 +89,7 @@ ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.2f}"))
 ax.grid(False)
 
 
-# ── Legends ───────────────────────────────────────────────────────────────────
+# Legends 
 # Color = representation
 rep_patches = [
     mpatches.Patch(facecolor=REP_COLORS[r], alpha=0.92, label=r)
@@ -124,13 +103,9 @@ model_handles = [
     for m in MODEL_ORDER
 ]
 
-"""leg1 = ax.legend(handles=rep_patches, frameon=False,
-                 fontsize=8.5, loc="lower right",
-                 title="Graph rep", title_fontsize=8.5)"""
-#ax.add_artist(leg1)
 ax.legend(handles=model_handles, frameon=False,
           fontsize=8.5, loc="lower right", ncols=3
-          ) #title="Model", title_fontsize=8.5
+          )
 
 fig.tight_layout()
 path = f"{OUTDIR}/fig2c_gnn_efficiency.pdf"

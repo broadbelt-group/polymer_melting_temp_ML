@@ -1,19 +1,3 @@
-"""
-train_final_full_data.py
-========================
-Train DEPLOYMENT models on the FULL internal dataset (all rows, no held-out split),
-for predicting EXTERNAL polymers (Table 2 / out-of-domain case studies).
-
-HARD RULE: external predictions ONLY. Never use for Table 1 / test metrics — there
-is no held-out test set here. Reported metrics come from saved_models_top/.
-Writes to a SEPARATE directory so the two lineages never mix.
-
-Uses your real CV.py infrastructure (same Huber loss, StandardScaler y-scaling,
-model classes) so deployment models match your pipeline exactly.
-
-USAGE (from the Regressor directory, in the `pbsg` env):
-    python train_final_full_data.py
-"""
 import os, json, numpy as np, joblib, torch
 from types import SimpleNamespace
 from torch_geometric.loader import DataLoader
@@ -35,8 +19,6 @@ TRAIN_GINE_PBSG = False
 
 
 def load_full_data():
-    # ADJUST these paths to where your generation step saved them
-    #graphs_PBSG    = torch.load("graphs_PBSG_all.pt")
     X_fp_pooled_RU = np.load("Vectors/X_fp_pooled_RU.npy")
     y              = np.load("Vectors/y.npy").astype(float)
 
@@ -45,7 +27,6 @@ def load_full_data():
         f"y has {len(np.unique(y))} unique values — looks like has_Tm not Tm.")
     assert y.min() < 50 and y.max() > 100, (
         f"y range [{y.min()},{y.max()}] doesn't look like Tm (C).")
-    #assert len(graphs_PBSG) == len(y) == X_fp_pooled_RU.shape[0], "row mismatch"
     print(f"Full data: N={len(y)}  Tm range [{y.min():.0f},{y.max():.0f}] C")
     return X_fp_pooled_RU, y
 

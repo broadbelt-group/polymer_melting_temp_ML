@@ -1,41 +1,3 @@
-"""
-optuna_tuning_full_reg.py
-=========================
-Full HP tuning for ALL 27 regression model/rep combinations
-with layers as a tunable hyperparameter.
-
-Saves to optuna_tuning_full_reg.db (separate from original).
-Best HPs saved to best_hp_reg.json.
-
-Models tuned:
-  GNNs (3 archs × 3 reps = 9):
-    GCN, GINE, GATv2 × PBSG, SMILES, SMILES+global
-
-  Classical (3 models × 6 reps = 18):
-    RR, RF, XGB × FP+pooled RU, FP+pooled poly, FP RU, FP poly,
-                  FP SMILES, FP SMILES+global
-
-Objective: mean_r2 - 0.5 * std_r2
-
-Resumable: all studies persist to optuna_tuning_full_reg.db via SQLite.
-
-Usage
------
-  from optuna_tuning_full_reg import tune_all_reg
-  tune_all_reg(
-      graphs_PBSG      = graphs_PBSG,
-      graphs_SMILES    = graphs_SMILES,
-      graphs_SMILES_gl = graphs_SMILES_gl,
-      X_fp_pooled_RU   = X_fp_pooled_RU,
-      X_fp_pooled_poly = X_fp_pooled_poly,
-      X_fp_RU          = X_fp_RU,
-      X_fp_poly        = X_fp_poly,
-      X_fp_SMILES      = X_fp_SMILES,
-      X_fp_SMILES_gl   = X_fp_SMILES_gl,
-      y=y, folds=folds_reg, df=df_reg, device=device,
-      n_trials=30,
-  )
-"""
 
 import json
 import warnings
@@ -62,9 +24,7 @@ HP_PATH = "best_hp_reg.json"
 SEED_CANDIDATES = [0, 1, 2, 3, 4, 10, 42]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # HELPERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _load_hp():
     try:
@@ -111,12 +71,9 @@ def _fold_r2(labels, preds):
     return float(r2_score(labels, preds)) if len(np.unique(labels)) > 1 else 0.0
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # SEARCH SPACES
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _suggest_gnn_hp(trial):
-    """GNN HP search space — layers free."""
     return SimpleNamespace(
         hidden       = trial.suggest_categorical("hidden_dim", [64, 128, 256]),
         layers       = trial.suggest_int("layers", 2, 5),
@@ -144,9 +101,7 @@ def _suggest_xgb_hp(trial):
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # OBJECTIVES
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _gnn_objective(arch, graphs, folds, device):
     in_ch, edge_dim, meta_dim = _graph_dims(graphs)
@@ -254,9 +209,7 @@ def _xgb_objective(X, y, folds):
     return objective
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # HP EXTRACTORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _hp_from_gnn_study(study, arch, rep):
     p = study.best_trial.params
@@ -310,9 +263,7 @@ def _hp_from_xgb_study(study):
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # MAIN
-# ══════════════════════════════════════════════════════════════════════════════
 
 def tune_all_reg(
     graphs_PBSG,
@@ -353,7 +304,7 @@ def tune_all_reg(
         hp[hp_key] = _hp_from_gnn_study(study, arch, rep)
         _save_hp(hp)
 
-    # ── RR (6 reps) ───────────────────────────────────────────────────────────
+    # ── RR (4 reps) ───────────────────────────────────────────────────────────
     rr_jobs = [
         ("reg_rr_fp_pooled_ru",   X_fp_pooled_RU,   "rr_fp_pooled_ru",   "FP+pooled RU"),
         ("reg_rr_fp_pooled_poly", X_fp_pooled_poly, "rr_fp_pooled_poly", "FP+pooled poly"),

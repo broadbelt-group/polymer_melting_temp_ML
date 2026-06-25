@@ -1,29 +1,10 @@
-"""
-figS_cv_boxplots.py
-===================
-SI Figure — per-fold CV stability box plots.
-
-Saves:
-  figS_cv_boxplots_cls.pdf  — AUPRC across 5 folds, top 9 clf combos
-  figS_cv_boxplots_reg.pdf  — R² across 5 folds, top 9 reg combos
-
-Usage
------
-  from figS_cv_boxplots import plot_cv_boxplots_cls, plot_cv_boxplots_reg
-  plot_cv_boxplots_cls()
-  plot_cv_boxplots_reg()
-
-Requires: cv_results_folds.csv, cv_results_folds_reg.csv
-"""
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 GNN_COLOR = "#2C7BB6"
 CLS_COLOR = "#D7191C"
@@ -45,17 +26,11 @@ TOP_N  = 9   # number of combinations to show
 
 
 def _model_color(name):
-    """Blue for GNN, red for classical."""
     model = name.split(" (")[0].upper()
     return GNN_COLOR if model in GNN_MODELS else CLS_COLOR
 
 
 def _boxplot(ax, data_dict, metric, ylabel, title, top_n=TOP_N):
-    """
-    Draw horizontal box plots sorted by median metric descending.
-
-    data_dict: {name: [fold_values]}
-    """
     # Sort by median, take top N
     medians = {k: np.median(v) for k, v in data_dict.items()}
     sorted_names = sorted(medians, key=medians.get, reverse=True)[:top_n]
@@ -89,9 +64,7 @@ def _boxplot(ax, data_dict, metric, ylabel, title, top_n=TOP_N):
               loc="lower right")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSIFICATION — AUPRC across folds
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_cv_boxplots_cls(csv_path="cv_results_folds.csv"):
     df = pd.read_csv(csv_path)
@@ -112,9 +85,7 @@ def plot_cv_boxplots_cls(csv_path="cv_results_folds.csv"):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # REGRESSION — R² across folds
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_cv_boxplots_reg(csv_path="cv_results_folds.csv"):
     df = pd.read_csv(csv_path)

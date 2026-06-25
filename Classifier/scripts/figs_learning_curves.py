@@ -1,23 +1,3 @@
-"""
-figS_learning_curves.py
-=======================
-SI Figure — GNN training/validation learning curves.
-Shows no overfitting during test set retraining.
-
-Saves:
-  figS_learning_curve_cls.pdf  — GINE + GATv2 classification
-  figS_learning_curve_reg.pdf  — GINE regression
-
-Usage
------
-  from figS_learning_curves import plot_learning_curves_cls, plot_learning_curves_reg
-  plot_learning_curves_cls()
-  plot_learning_curves_reg()
-
-Requires:
-  test_training_histories.json      (classification)
-  test_training_histories_reg.json  (regression)
-"""
 
 import json
 import numpy as np
@@ -58,9 +38,7 @@ def _plot_learning_curve(ax, history, label, color,
             label=f"{label} val ({val_label})")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSIFICATION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_learning_curves_cls(path="test_training_histories-full.json"):
     with open(path) as f:
@@ -109,9 +87,7 @@ def plot_learning_curves_cls(path="test_training_histories-full.json"):
     print(f"Saved: {out}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # REGRESSION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_learning_curves_reg(path="test_training_histories_reg.json"):
     with open(path) as f:

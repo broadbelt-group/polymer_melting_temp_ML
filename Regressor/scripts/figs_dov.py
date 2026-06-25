@@ -1,49 +1,11 @@
-"""
-figS_dov.py
-===========
-SI Figure — Domain of Validity analysis.
-
-Panels:
-  figS_dov_cls.pdf  — classification DoV
-    Panel A: DoV score distribution (train LOO vs test), threshold marked
-    Panel B: AUPRC by reliability tier (best model = XGB FP+pooled poly)
-
-  figS_dov_reg.pdf  — regression DoV
-    Panel A: DoV score distribution (train LOO vs test), threshold marked
-    Panel B: MAE by reliability tier (best model = XGB FP+pooled RU)
-
-Also:
-  fig2c_gnn_efficiency_reg.pdf  — GNN R² vs training time (regression)
-
-Usage
------
-  from figS_dov import plot_dov_cls, plot_dov_reg, plot_reg_efficiency
-  
-  # Classification (in classifier notebook):
-  plot_dov_cls(dov, result_df, test_results)
-  
-  # Regression (in regression notebook):
-  plot_dov_reg(dov_reg, result_df_reg, test_results_reg)
-  
-  # Regression GNN efficiency (in regression notebook):
-  plot_reg_efficiency()   # requires cv_results_reg.csv
-
-Requires:
-  test_predictions.json         (classification)
-  test_predictions_reg.json     (regression)
-  cv_results_reg.csv            (regression efficiency)
-"""
 
 import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from sklearn.metrics import average_precision_score
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 COLOR_TRAIN    = "#2C7BB6"
 COLOR_TEST     = "#D7191C"
@@ -86,12 +48,9 @@ DPI    = 300
 OUTDIR = "Figures"
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # SHARED: DoV distribution panel
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _plot_dov_distribution(ax, dov, result_df):
-    """Panel A: train LOO scores vs test scores, threshold marked."""
     train_scores = dov.loo_scores_
     test_scores  = result_df["dov_score"].values
     threshold    = dov.threshold_
@@ -130,20 +89,10 @@ def _plot_dov_distribution(ax, dov, result_df):
     ax.legend(frameon=False, fontsize=8.5)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSIFICATION DoV
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_dov_cls(dov, result_df, test_results,
                  best_model_key="xgb_poly"):
-    """
-    Parameters
-    ----------
-    dov           : fitted DomainOfValidityV2 instance
-    result_df     : output of dov.score_df() on test set
-    test_results  : dict from run_all_test (has probs/preds/labels per model)
-    best_model_key: key in test_results for the model to show in Panel B
-    """
     # Load predictions
     labels = np.array(test_results[best_model_key]["labels"])
     probs  = np.array(test_results[best_model_key]["probs"])
@@ -210,20 +159,10 @@ def plot_dov_cls(dov, result_df, test_results,
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # REGRESSION DoV
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_dov_reg(dov_reg, result_df_reg, test_results_reg,
                  best_model_key="xgb_ru"):
-    """
-    Parameters
-    ----------
-    dov_reg         : fitted DomainOfValidityV2 for regression
-    result_df_reg   : output of dov_reg.score_df() on regression test set
-    test_results_reg: dict from run_all_test_reg
-    best_model_key  : key in test_results_reg for Panel B
-    """
     labels = np.array(test_results_reg[best_model_key]["labels"])
     preds  = np.array(test_results_reg[best_model_key]["preds"])
     tiers  = result_df_reg["reliability"].astype(str).values
@@ -250,7 +189,6 @@ def plot_dov_reg(dov_reg, result_df_reg, test_results_reg,
                 float(np.mean(np.abs(labels[mask] - preds[mask])))
             )
         tier_colors.append(TIER_COLORS[tier])
-        print(tier_maes)
 
     x = np.arange(len(TIER_ORDER))
     bars = ax.bar(x, [v if not np.isnan(v) else 0 for v in tier_maes],
@@ -288,9 +226,7 @@ def plot_dov_reg(dov_reg, result_df_reg, test_results_reg,
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # REGRESSION GNN EFFICIENCY SCATTER (R² vs training time)
-# ══════════════════════════════════════════════════════════════════════════════
 
 plt.rcParams.update({
     "font.family":        "sans-serif",
@@ -308,10 +244,6 @@ DPI    = 300
 OUTDIR = "."
 
 def plot_reg_efficiency(csv_path="cv_results_reg.csv"):
-    """
-    R² vs training time scatter for GNN graph rep combos only.
-    Mirrors the classification efficiency scatter.
-    """
     df = pd.read_csv(csv_path)
     df["model"] = df["name"].str.extract(r"^(.+?)\s*\(")[0].str.strip().str.upper()
     df["rep"]   = df["name"].str.extract(r"\((.+)\)")[0].str.strip()
@@ -347,26 +279,6 @@ def plot_reg_efficiency(csv_path="cv_results_reg.csv"):
     ax.yaxis.set_major_formatter(
         plt.FuncFormatter(lambda v, _: f"{v:.2f}"))
     ax.grid(False)
-
-    # ── Legends ───────────────────────────────────────────────────────────────
-    import matplotlib.lines as mlines
-    rep_patches = [
-        mpatches.Patch(facecolor=REP_COLORS_REG[r], alpha=0.92, label=r)
-        for r in REP_ORDER_REG
-    ]
-    model_handles = [
-        mlines.Line2D([], [], color="grey",
-                      marker=MODEL_MARKERS_REG[m],
-                      markersize=8, linestyle="None", label=m)
-        for m in MODEL_ORDER_REG
-    ]
-    # leg1 = ax.legend(handles=rep_patches, frameon=False,
-    #                  fontsize=8.5, loc="lower right",
-    #                  title="Graph rep", title_fontsize=8.5)
-    # ax.add_artist(leg1)
-    # ax.legend(handles=model_handles, frameon=False,
-    #           fontsize=8.5, loc="center right",
-    # )
 
     fig.tight_layout()
     path = f"{OUTDIR}/fig2c_gnn_efficiency_reg.pdf"

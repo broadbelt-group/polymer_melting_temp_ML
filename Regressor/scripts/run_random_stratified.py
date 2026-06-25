@@ -1,32 +1,3 @@
-"""
-run_random_stratified_reg.py
-============================
-Random stratified train/val/test split for polymer Tm regression.
-
-Differences from classification version:
-  - Dataset is already filtered to has_Tm=True (no label axis)
-  - Stratification uses Tm quartile bins instead of has_Tm
-    so each fold sees the full range of Tm values
-  - Output: random_stratified_splits_reg.json
-
-Stratification label: polymer_class | stereo_class | Tm_bin
-  - polymer_class: SMARTS-derived (same 8 classes as classification)
-  - stereo_class:  from dataframe column
-  - Tm_bin:        quartile bin (Q1/Q2/Q3/Q4) of Tm in Celsius
-
-Progressive fallback:
-  Level 0: class|stereo|Tm_bin   (finest)
-  Level 1: class|Tm_bin          (if stratum n < 2)
-  Level 2: Tm_bin only           (last resort — always n >> 2)
-
-Split structure
----------------
-  15% held-out test  →  StratifiedShuffleSplit
-  85% train+val      →  StratifiedKFold 5-fold
-
-Output: JSON with same schema as classification split
-  {"test": [...], "folds": [{"train": [...], "val": [...]}, ...]}
-"""
 
 import json
 import warnings
@@ -194,20 +165,6 @@ def run_random_stratified_reg(
     seed: int        = 0,
     verbose: bool    = True,
 ) -> dict:
-    """
-    Build a random stratified train/val/test split for Tm regression.
-
-    Parameters
-    ----------
-    df          : regression dataframe (has_Tm=True subset)
-    output_file : path to save JSON
-    seed        : random seed
-    verbose     : print diagnostics
-
-    Returns
-    -------
-    dict with keys "test" and "folds"
-    """
     n       = len(df)
     idx_all = np.arange(n)
     strat   = _build_strat_labels(df)
@@ -300,13 +257,6 @@ def seed_search_random_stratified_reg(
     output_file: str = OUTPUT_FILE,
     verbose: bool    = True,
 ) -> int:
-    """
-    Search seeds 0..n_seeds-1 and return the best one.
-
-    Scoring: penalise seeds where any polymer class or stereo class
-    present in train is missing from test. Among clean seeds, prefer
-    the one with Tm mean and std in test closest to global.
-    """
     strat     = _build_strat_labels(df)
     poly_cls  = assign_polymer_classes(df).values
     stereo    = df[COLS["stereo"]].fillna("unknown").values

@@ -1,9 +1,0 @@
-Figure 1 Panel A — Schematic
-=============================
-Make in ChemDraw or PowerPoint.
-
-Suggested content:
-  - Show the same polymer repeat unit in isotactic vs syndiotactic form
-  - Arrow: repeat unit SMILES → PBSG graph with stereo/regio annotations
-  - Highlight that stereo class is encoded as a graph-level feature
-  - Optional: show has_Tm label as a binary output node

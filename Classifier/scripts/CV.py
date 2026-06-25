@@ -1,40 +1,3 @@
-"""
-cv_cls.py
-=========
-Reusable CV functions for all classification model/rep combinations.
-
-Self-contained: includes model classes, build_gnn_model, training
-functions, and CV runners. IN_CHANNELS / EDGE_DIM / META_DIM are
-extracted automatically from each graph list — no globals needed.
-
-Usage
------
-from cv_cls import run_all_gnn_cv, run_all_classical_cv, print_cv_summary
-
-graph_reps = {
-    "PBSG":          graphs_PBSG,
-    "SMILES":        graphs_SMILES,
-    "SMILES+global": graphs_SMILESplusglobal,
-}
-vector_reps = {
-    "FP RU":          X_fp_RU,
-    "FP+pooled RU":   X_fp_pooled_RU,
-    "FP poly":        X_fp_poly,
-    "FP+pooled poly": X_fp_pooled_poly,
-}
-
-# With tuned HPs:
-hp = load_tuned_hp_cls("best_hp_full.json")
-gnn_results = run_all_gnn_cv(graph_reps, folds, df, device, hp_dict=hp)
-cls_results = run_all_classical_cv(vector_reps, y, folds, df, hp_dict=hp)
-print_cv_summary(gnn_results + cls_results)
-
-# Without tuned HPs (uses defaults):
-gnn_results = run_all_gnn_cv(graph_reps, folds, df, device)
-cls_results = run_all_classical_cv(vector_reps, y, folds, df)
-print_cv_summary(gnn_results + cls_results)
-"""
-
 import json
 import random
 import time
@@ -59,9 +22,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # UTILITIES
-# ══════════════════════════════════════════════════════════════════════════════
 
 def set_seed(seed: int):
     random.seed(seed)
@@ -78,30 +39,14 @@ def _graph_dims(graphs):
     return in_ch, edge_dim, meta_dim
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # LOAD TUNED HPs
-# ══════════════════════════════════════════════════════════════════════════════
 
 def load_tuned_hp_cls(path="best_hp_full.json"):
-    """Load tuned HPs from Optuna JSON output."""
     with open(path) as f:
         return json.load(f)
 
 
 def hp_to_args_cls(hp_dict, key):
-    """
-    Convert a HP dict entry to SimpleNamespace (GNN) or dict (classical).
-
-    Parameters
-    ----------
-    hp_dict : full dict from best_hp_full.json
-    key     : e.g. "gine_pbsg", "xgb_fp_pooled_ru", "lr_fp_ru"
-
-    Returns
-    -------
-    For GNN:       (SimpleNamespace args, int seed)
-    For classical: dict of model kwargs
-    """
     hp = hp_dict[key]
     if hp["type"] == "gnn":
         args = SimpleNamespace(
@@ -120,7 +65,6 @@ def hp_to_args_cls(hp_dict, key):
 
 
 def _build_classical_tuned(model_name, hp, scale_pos_weight=1.0):
-    """Build classical classifier with tuned HPs from JSON."""
     if model_name == "lr":
         return LogisticRegression(
             C            = hp.get("C", 1.0),
@@ -155,9 +99,7 @@ def _build_classical_tuned(model_name, hp, scale_pos_weight=1.0):
     raise ValueError(f"Unknown model: {model_name}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN MODEL CLASSES
-# ══════════════════════════════════════════════════════════════════════════════
 
 class GCNModel(torch.nn.Module):
     def __init__(self, in_channels, meta_dim, hidden=64, n_layers=3,
@@ -274,9 +216,7 @@ def build_gnn_model(arch, in_ch, edge_dim, meta_dim, args=None):
     raise ValueError(f"Unknown arch: {arch}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # TRAINING FUNCTIONS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def train_epoch(model, loader, optimizer, device):
     model.train()
@@ -362,9 +302,7 @@ def train_gnn(model, train_loader, val_loader, args, device):
     return model, history
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # METRICS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def compute_metrics(y_true, y_pred, y_prob):
     return {
@@ -425,9 +363,7 @@ def collect_subgroup_results(df, all_labels, all_preds, all_indices,
     return result
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # DEFAULT HPs
-# ══════════════════════════════════════════════════════════════════════════════
 
 GNN_DEFAULTS = {
     "gcn":   SimpleNamespace(hidden=64,  layers=3, dropout=0.2, lr=1e-3,
@@ -444,9 +380,7 @@ GNN_DEFAULTS = {
 GNN_DEFAULT_SEEDS = {"gcn": 0, "gine": 0, "gatv2": 1}
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN CV
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_gnn_cv(arch, graphs, folds, df, device,
                name=None, args=None, seed=None, verbose=True):
@@ -527,9 +461,7 @@ def run_gnn_cv(arch, graphs, folds, df, device,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSICAL CV
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _build_classical(model_name, scale_pos_weight=1.0):
     if model_name == "lr":
@@ -555,7 +487,6 @@ def _build_classical(model_name, scale_pos_weight=1.0):
 def run_classical_cv(model_name, X, y, folds, df,
                      name=None, scale_pos_weight=None, verbose=True,
                      tuned_hp=None):
-    """5-fold CV for one classical model × vector rep combination."""
     name = name or model_name.upper()
 
     if scale_pos_weight is None:
@@ -625,23 +556,11 @@ def run_classical_cv(model_name, X, y, folds, df,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # BATCH RUNNERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_all_gnn_cv(graph_reps, folds, df, device,
                    archs=None, verbose=True,
                    hp_dict=None):
-    """
-    Run all GNN arch × graph rep combinations.
-
-    Parameters
-    ----------
-    graph_reps : dict of {rep_name: graph_list}
-    archs      : list — defaults to ["gcn", "gine", "gatv2"]
-    hp_dict    : loaded JSON from best_hp_full.json (optional)
-                 If provided uses tuned HPs, falls back to defaults.
-    """
     archs   = archs or ["gcn", "gine", "gatv2"]
     results = []
 
@@ -670,15 +589,6 @@ def run_all_gnn_cv(graph_reps, folds, df, device,
 def run_all_classical_cv(vector_reps, y, folds, df,
                          models=None, verbose=True,
                          hp_dict=None):
-    """
-    Run all classical model × vector rep combinations.
-
-    Parameters
-    ----------
-    vector_reps : dict of {rep_name: X_array}
-    models      : list — defaults to ["lr", "rf", "xgb"]
-    hp_dict     : loaded JSON from best_hp_full.json (optional)
-    """
     models  = models or ["lr", "rf", "xgb"]
     results = []
 
@@ -711,12 +621,9 @@ def run_all_classical_cv(vector_reps, y, folds, df,
     return results
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # SUMMARY TABLE
-# ══════════════════════════════════════════════════════════════════════════════
 
 def print_cv_summary(results, sort_by="auprc"):
-    """Ranked summary table across all model/rep combinations."""
     rows = []
     for r in results:
         t = r.get("time_s", 0)

@@ -1,36 +1,12 @@
-"""
-fig2a_cv_heatmap.py
-===================
-Figure 2 Panel A — two separate CV AUPRC heatmaps:
-  fig2a_cv_heatmap_gnn.pdf       — GNN models × all reps
-  fig2a_cv_heatmap_classical.pdf — Classical models × vector reps only
-
-Column order groups pooled next to non-pooled to show
-the coarse-grained feature benefit directly.
-
-Usage
------
-  python fig2a_cv_heatmap.py
-  # or in notebook:
-  %run fig2a_cv_heatmap.py
-
-Requires: cv_results.csv
-"""
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 CMAP_GNN = "Purples"      # heatmap colormap for GNN panel
 CMAP_CLS = "Purples"     # heatmap colormap for classical panel
-                         # alternatives: "Blues", "viridis", "RdYlGn"
-
-                         #CMAP = "RdYlGn" 
 
 plt.rcParams.update({
     "font.family":     "sans-serif",
@@ -50,9 +26,7 @@ plt.rcParams.update({
 })
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # LOAD & PARSE
-# ══════════════════════════════════════════════════════════════════════════════
 
 df = pd.read_csv("cv_results_full.csv")
 df["model"] = df["name"].str.extract(r"^(.+?)\s*\(")[0].str.strip().str.upper()
@@ -90,9 +64,7 @@ GNN_ROWS = ["GCN", "GINE", "GATV2"]
 CLS_ROWS = ["LR", "RF", "XGB"]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # SHARED PLOT FUNCTION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _plot_heatmap(pivot, pivot_std, row_order, col_order,
                   cmap, title, outpath,
@@ -137,7 +109,6 @@ def _plot_heatmap(pivot, pivot_std, row_order, col_order,
 
     ax.set_xlabel("Representation", fontsize=10, labelpad=8)
     ax.set_ylabel("Model", fontsize=10, labelpad=8)
-    #ax.set_title(title, fontsize=11, fontweight="bold", pad=12)
 
     # ── Divider: graph reps vs vector reps ────────────────────────────────────
     if n_graph_reps > 0 and n_graph_reps < n_cols:
@@ -153,20 +124,12 @@ def _plot_heatmap(pivot, pivot_std, row_order, col_order,
         ax.axvline(pair_end - 0.5, color="lightgrey", lw=0.7,
                    linestyle=":", alpha=0.8)
 
-    # ── Colorbar ──────────────────────────────────────────────────────────────
-    #cbar = plt.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
-    #cbar.set_label("Mean AUPRC (5-fold CV)", fontsize=9)
-    #cbar.ax.tick_params(labelsize=8)
-
-    
     fig.savefig(outpath, dpi=DPI, bbox_inches="tight")
     plt.close(fig)
     print(f"Saved: {outpath}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN HEATMAP
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_gnn_heatmap():
     df_gnn = df[df["model"].isin(GNN_ROWS)]
@@ -182,7 +145,6 @@ def plot_gnn_heatmap():
     # Count graph rep columns for divider
     n_graph = sum(1 for c in cols if c in ["PBSG", "SMILES+global", "SMILES"])
 
-    # Shared vmin/vmax across both heatmaps for comparability
     _plot_heatmap(
         pivot, pivot_std, rows, cols,
         cmap        = CMAP_GNN,
@@ -192,9 +154,7 @@ def plot_gnn_heatmap():
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSICAL HEATMAP
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_classical_heatmap():
     df_cls = df[df["model"].isin(CLS_ROWS)]
@@ -215,9 +175,7 @@ def plot_classical_heatmap():
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # RUN
-# ══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     plot_gnn_heatmap()

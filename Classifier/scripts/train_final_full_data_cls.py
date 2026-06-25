@@ -1,24 +1,6 @@
-"""
-train_final_full_data_cls.py
-============================
-Train the FULL-DATA deployment CLASSIFIER (best model: XGB FP+pooled poly) on ALL
-classifier rows, for predicting EXTERNAL polymers (Table 2 case studies).
-
-HARD RULE: external predictions ONLY. Reported metrics (Table 1) come from the
-held-out lineage (saved_models_top/). Writes to saved_models_final_fulldata/.
-
-Threshold: carries over the REPORTED threshold (validated on held-out test),
-rather than recomputing — no held-out set exists in full-data mode.
-
-USAGE (from the Classifier directory, in the `pbsg` env):
-    python train_final_full_data_cls.py     OR     %run in a Classifier/ notebook
-"""
 import os, json, numpy as np, joblib
 
-# ── classifier infrastructure — CONFIRM these names match your Classifier/scripts/CV.py ──
-# The classifier analog of the regressor builders. If your function is named
-# differently, change this import line only.
-from scripts.CV import _build_classical_tuned, hp_to_args_cls, load_tuned_hp_cls   # <-- confirm names
+from scripts.CV import _build_classical_tuned, hp_to_args_cls, load_tuned_hp_cls
 
 HP_FILE        = "best_hp_full.json"
 OUT_DIR        = "saved_models_final_fulldata"
@@ -29,9 +11,8 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 
 def load_full_data_cls():
-    # ADJUST paths to your full classifier feature array + label
-    X = np.load("Vectors/X_fp_pooled_poly.npy")     # <-- poly features (classifier)
-    y = np.load("Vectors/y.npy").astype(int)    # <-- has_Tm label (0/1)
+    X = np.load("Vectors/X_fp_pooled_poly.npy")
+    y = np.load("Vectors/y.npy").astype(int)
 
     assert y.ndim == 1, "y must be 1-D"
     uniq = set(np.unique(y).tolist())

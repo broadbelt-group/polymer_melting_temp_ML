@@ -1,27 +1,3 @@
-"""
-fig1_dataset_overview.py
-========================
-Figure 1 panels for dataset overview.
-
-Panels saved as separate PDFs for PowerPoint assembly:
-  fig1_note_panelA.txt        — reminder to make schematic in ChemDraw/PPT
-  fig1b_dataset_composition.pdf — stereo class distribution colored by has_Tm
-  fig1c_label_distribution.pdf  — has_Tm in train vs test
-  fig1d_tsne.pdf                — t-SNE of X_fp_RU colored by train/test
-
-Usage
------
-  # In your notebook, make sure these are loaded:
-  #   df_cls        : full classification dataframe (643 rows)
-  #   X_fp_RU       : repeat unit Morgan FP array (643, n_bits)
-  #   trainval_idx  : list of trainval indices
-  #   test_idx      : list of test indices
-
-  %run fig1_dataset_overview.py
-
-Requires: df_cls, X_fp_RU, trainval_idx, test_idx in notebook namespace
-"""
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -32,9 +8,7 @@ from rdkit import Chem
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS — change to match your paper palette
-# ══════════════════════════════════════════════════════════════════════════════
 
 COLOR_HAS_TM    = "#2C7BB6"   # blue  — has Tm
 COLOR_NO_TM     = "#D7191C"   # red   — no Tm
@@ -69,27 +43,8 @@ DPI    = 300
 OUTDIR = "Figures"
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PANEL A — placeholder note
-# ══════════════════════════════════════════════════════════════════════════════
 
-with open(f"{OUTDIR}/fig1_note_panelA.txt", "w") as f:
-    f.write(
-        "Figure 1 Panel A — Schematic\n"
-        "=============================\n"
-        "Make in ChemDraw or PowerPoint.\n\n"
-        "Suggested content:\n"
-        "  - Show the same polymer repeat unit in isotactic vs syndiotactic form\n"
-        "  - Arrow: repeat unit SMILES → PBSG graph with stereo/regio annotations\n"
-        "  - Highlight that stereo class is encoded as a graph-level feature\n"
-        "  - Optional: show has_Tm label as a binary output node\n"
-    )
-print("Saved: fig1_note_panelA.txt")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL B — dataset stereo class composition colored by has_Tm
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_dataset_composition(df):
     stereo_col = "stereo_class"
@@ -140,9 +95,7 @@ def plot_dataset_composition(df):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL C — has_Tm label distribution: train vs test
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_label_distribution(df, trainval_idx, test_idx):
     trainval_idx = np.array(trainval_idx)
@@ -197,22 +150,10 @@ def plot_label_distribution(df, trainval_idx, test_idx):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL D — t-SNE colored by train/test split
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_tsne(X, df, trainval_idx, test_idx,
               perplexity=30, random_state=42):
-    """
-    Run t-SNE on X_fp_RU and color by train/test.
-
-    Parameters
-    ----------
-    X            : numpy array (n_samples, n_features) — X_fp_RU
-    df           : full dataframe
-    trainval_idx : list/array of trainval indices
-    test_idx     : list/array of test indices
-    """
     trainval_idx = np.array(trainval_idx)
     test_idx     = np.array(test_idx)
 
@@ -266,10 +207,8 @@ def plot_tsne(X, df, trainval_idx, test_idx,
                     # different coloring without rerunning t-SNE
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # RUN ALL — expects these in notebook namespace:
 #   df_cls, X_fp_RU, trainval_idx, test_idx
-# ══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     # These must be loaded in your notebook before running
@@ -293,4 +232,3 @@ if __name__ == "__main__":
     print("Saved: tsne_coords_cls.npy  (reload to replot without rerunning t-SNE)")
 
     print("\nAll Figure 1 panels saved.")
-    print("Panel A: make the schematic in ChemDraw/PowerPoint — see fig1_note_panelA.txt")

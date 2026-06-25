@@ -1,20 +1,3 @@
-"""
-fig_test_results_regressor.py
-==================
-Figures for regression test results.
-
-Panels saved as separate PDFs:
-  fig_pred_vs_actual.pdf     — predicted vs actual Tm, 3 subplots (one per model)
-  fig_residuals_stereo.pdf   — residual distribution by stereo class (box plot)
-  fig_subgroup_mae_stereo.pdf — MAE by stereo class, all 3 models
-  fig_subgroup_mae_arch.pdf  — MAE by copolymer architecture, all 3 models
-  fig_tm_distribution.pdf    — Tm distribution: train vs test (KDE + histogram)
-
-Requires:
-  test_predictions_reg.json
-  test_results_reg_subgroups.json
-  df_reg, trainval_idx_reg, test_idx_reg in notebook namespace
-"""
 
 import json
 import numpy as np
@@ -23,9 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from scipy.stats import gaussian_kde
 
-# ══════════════════════════════════════════════════════════════════════════════
 # COLORS
-# ══════════════════════════════════════════════════════════════════════════════
 
 MODEL_COLORS = {
     "gatv2_pbsg":   "#BD2D87",
@@ -46,7 +27,6 @@ REP_COLORS_REG = {
     "SMILES":        "#AEC6E8",  
 }
 MODEL_ORDER = ["gatv2_pbsg", "xgb_fp_pooled_ru", "xgb_fp_pooled_poly"]
-#MODEL_ORDER=    ["xgb_fp_ru",  "xgb_fp_pooled_ru", "gatv2_pbsg"]
 
 STEREO_COLORS = {
     "isotactic":    "#2C7BB6",
@@ -83,9 +63,7 @@ DPI    = 300
 OUTDIR = "Figures"
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # LOAD DATA
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _load_data():
     with open("test_predictions_reg_full.json") as f:
@@ -95,9 +73,7 @@ def _load_data():
     return preds, subgroups
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL A — Predicted vs Actual Tm (3 subplots)
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_pred_vs_actual(preds, df_reg, test_idx):
     test_idx = np.array(test_idx)
@@ -112,7 +88,6 @@ def plot_pred_vs_actual(preds, df_reg, test_idx):
         print(mk)
         print(color)
 
-        # Color by stereo class
         for s in STEREO_ORDER:
             mask = stereo == s
             if mask.sum() == 0:
@@ -147,15 +122,6 @@ def plot_pred_vs_actual(preds, df_reg, test_idx):
     axes[0].set_ylabel("Predicted T$_m$ (°C)", fontsize=14)
 
     # Shared stereo legend on last panel
-    # handles = [mpatches.Patch(facecolor=STEREO_COLORS[s], alpha=0.85,
-    #                            label=s.capitalize())
-    #            for s in STEREO_ORDER]
-    # axes[2].legend(handles=handles, frameon=False, fontsize=8,
-    #                loc="lower right", title="Stereo class",
-    #                title_fontsize=8)
-
-    # fig.suptitle("Predicted vs Actual T$_m$", fontsize=12,
-    #              fontweight="bold", y=1.01)
     fig.tight_layout()
     path = f"{OUTDIR}/fig_pred_vs_actual.pdf"
     fig.savefig(path, dpi=DPI, bbox_inches="tight")
@@ -163,9 +129,7 @@ def plot_pred_vs_actual(preds, df_reg, test_idx):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL B — Residuals by Stereo Class (box plot, one panel per model)
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_residuals_stereo(preds, df_reg, test_idx):
     test_idx = np.array(test_idx)
@@ -214,9 +178,7 @@ def plot_residuals_stereo(preds, df_reg, test_idx):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL C — Subgroup MAE by Stereo Class
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_subgroup_mae_stereo(subgroups):
     x     = np.arange(len(STEREO_ORDER))
@@ -237,18 +199,10 @@ def plot_subgroup_mae_stereo(subgroups):
                       edgecolor="white", lw=0.5,
                       label=MODEL_LABELS[mk])
 
-        # for bar, n in zip(bars, ns):
-        #     ax.text(bar.get_x() + bar.get_width() / 2,
-        #             bar.get_height() + 0.3,
-        #             f"n={n}", ha="center", va="bottom",
-        #             fontsize=7, color="dimgrey")
-
     ax.set_xticks(x)
     ax.set_xticklabels([s.capitalize() for s in STEREO_ORDER],
                        rotation=0, ha="center")
     ax.set_ylabel("MAE (°C)", fontsize=14)
-    #ax.set_title("MAE by Stereo Class", fontsize=11, fontweight="bold")
-    #ax.legend(frameon=False, fontsize=8.5)
     ax.grid(False)
 
     fig.tight_layout()
@@ -258,9 +212,7 @@ def plot_subgroup_mae_stereo(subgroups):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL D — Subgroup MAE by Copolymer Architecture
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_subgroup_mae_arch(subgroups):
     x     = np.arange(len(ARCH_ORDER))
@@ -281,18 +233,9 @@ def plot_subgroup_mae_arch(subgroups):
                       edgecolor="white", lw=0.5,
                       label=MODEL_LABELS[mk])
 
-        # for bar, n in zip(bars, ns):
-        #     ax.text(bar.get_x() + bar.get_width() / 2,
-        #             bar.get_height() + 0.3,
-        #             f"n={n}", ha="center", va="bottom",
-        #             fontsize=7, color="dimgrey")
-
     ax.set_xticks(x)
     ax.set_xticklabels([a.capitalize() for a in ARCH_ORDER])
     ax.set_ylabel("MAE (°C)", fontsize=14)
-    # ax.set_title("MAE by Copolymer Architecture",
-    #              fontsize=11, fontweight="bold")
-    #ax.legend(frameon=False, fontsize=8.5)
     ax.grid(False)
 
     fig.tight_layout()
@@ -302,9 +245,7 @@ def plot_subgroup_mae_arch(subgroups):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PANEL E — Tm Distribution: Train vs Test
-# ══════════════════════════════════════════════════════════════════════════════
 
 def plot_tm_distribution(df_reg, trainval_idx, test_idx):
     trainval_idx = np.array(trainval_idx)
@@ -356,9 +297,7 @@ def plot_tm_distribution(df_reg, trainval_idx, test_idx):
     print(f"Saved: {path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # RUN ALL
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_all_fig(df_reg, trainval_idx, test_idx):
     preds, subgroups = _load_data()

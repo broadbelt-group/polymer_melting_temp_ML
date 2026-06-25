@@ -1,49 +1,3 @@
-"""
-cv_reg.py
-=========
-Reusable CV functions for all regression model/rep combinations.
-Mirrors cv_cls.py structure exactly — same batch runner pattern,
-same timing, same summary table.
-
-Self-contained: includes regressor model classes, build_gnn_model_reg,
-training functions, and CV runners. Dims extracted automatically per rep.
-
-Target: Tm in Celsius (raw). Scaled internally per fold using
-StandardScaler fit on train only, inverse-transformed for metrics.
-
-Metrics: MAE, RMSE, R²
-
-Models:
-  GNN:       GCN, GINE, GATv2
-  Classical: Ridge (RR), RF, XGB
-
-Usage
------
-from cv_reg import run_all_gnn_cv_reg, run_all_classical_cv_reg, print_cv_summary_reg
-
-graph_reps = {
-    "PBSG":          graphs_PBSG_reg,
-    "SMILES":        graphs_SMILES_reg,
-    "SMILES+global": graphs_SMILESplusglobal_reg,
-}
-vector_reps = {
-    "FP RU":          X_fp_RU,
-    "FP+pooled RU":   X_fp_pooled_RU,
-    "FP poly":        X_fp_poly,
-    "FP+pooled poly": X_fp_pooled_poly,
-}
-
-# With tuned HPs:
-hp = load_tuned_hp_reg("best_hp_reg.json")
-gnn_results = run_all_gnn_cv_reg(graph_reps, folds_reg, df_reg, device, y=y, hp_dict=hp)
-cls_results = run_all_classical_cv_reg(vector_reps, y, folds_reg, df_reg, hp_dict=hp)
-print_cv_summary_reg(gnn_results + cls_results)
-
-# Without tuned HPs (uses defaults):
-gnn_results = run_all_gnn_cv_reg(graph_reps, folds_reg, df_reg, device, y=y)
-cls_results = run_all_classical_cv_reg(vector_reps, y, folds_reg, df_reg)
-print_cv_summary_reg(gnn_results + cls_results)
-"""
 
 import json
 import random
@@ -66,9 +20,7 @@ from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # UTILITIES
-# ══════════════════════════════════════════════════════════════════════════════
 
 def set_seed(seed: int):
     random.seed(seed)
@@ -86,10 +38,6 @@ def _graph_dims(graphs):
 
 
 def _inject_y(graphs, y_array):
-    """
-    Inject external y values into graph objects in-place.
-    Only injects if g.y is None — leaves existing y values untouched.
-    """
     n_injected = 0
     for i, g in enumerate(graphs):
         if g.y is None:
@@ -101,7 +49,6 @@ def _inject_y(graphs, y_array):
 
 
 def compute_metrics(labels, preds):
-    """Regression metrics in original (Celsius) space."""
     mae  = float(mean_absolute_error(labels, preds))
     rmse = float(np.sqrt(np.mean((labels - preds) ** 2)))
     r2   = float(r2_score(labels, preds)) if len(np.unique(labels)) > 1 else 0.0
@@ -111,7 +58,6 @@ def compute_metrics(labels, preds):
 def collect_subgroup_results_reg(df, all_labels, all_preds, all_indices,
                                   arch_col="copolymer_type",
                                   stereo_col="stereo_class"):
-    """Subgroup breakdown for regression — MAE, RMSE, R² per group."""
     sub = df.iloc[all_indices].copy().reset_index(drop=True)
     sub["_label"] = all_labels
     sub["_pred"]  = all_preds
@@ -133,30 +79,14 @@ def collect_subgroup_results_reg(df, all_labels, all_preds, all_indices,
     return result
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # LOAD TUNED HPs
-# ══════════════════════════════════════════════════════════════════════════════
 
 def load_tuned_hp_reg(path="best_hp_reg.json"):
-    """Load tuned HPs from Optuna JSON output."""
     with open(path) as f:
         return json.load(f)
 
 
 def hp_to_args_reg(hp_dict, key):
-    """
-    Convert a HP dict entry to SimpleNamespace (GNN) or dict (classical).
-
-    Parameters
-    ----------
-    hp_dict : full dict from best_hp_reg.json
-    key     : e.g. "gine_pbsg", "xgb_fp_pooled_ru", "rr_fp_ru"
-
-    Returns
-    -------
-    For GNN:       (SimpleNamespace args, int seed)
-    For classical: dict of model kwargs
-    """
     hp = hp_dict[key]
     if hp["type"] == "gnn":
         args = SimpleNamespace(
@@ -175,7 +105,6 @@ def hp_to_args_reg(hp_dict, key):
 
 
 def _build_classical_reg_tuned(model_name, hp):
-    """Build classical regressor with tuned HPs from JSON."""
     if model_name == "rr":
         return Ridge(alpha=hp.get("alpha", 1.0))
     elif model_name == "rf":
@@ -202,9 +131,7 @@ def _build_classical_reg_tuned(model_name, hp):
     raise ValueError(f"Unknown model: {model_name}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN REGRESSOR MODEL CLASSES
-# ══════════════════════════════════════════════════════════════════════════════
 
 class GCNRegressor(torch.nn.Module):
     def __init__(self, in_channels, meta_dim, hidden=64, n_layers=3,
@@ -324,9 +251,7 @@ def build_gnn_model_reg(arch, in_ch, edge_dim, meta_dim, args=None):
     raise ValueError(f"Unknown arch: {arch}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # TRAINING FUNCTIONS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def scale_graphs(gs, y_scaler):
     out = []
@@ -419,9 +344,7 @@ def train_gnn_reg(model, train_loader, val_loader, args, device):
     return model, history
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # DEFAULT HPs
-# ══════════════════════════════════════════════════════════════════════════════
 
 GNN_DEFAULTS_REG = {
     "gcn":   SimpleNamespace(hidden=64,  layers=3, dropout=0.3, lr=3e-4,
@@ -438,21 +361,10 @@ GNN_DEFAULTS_REG = {
 GNN_DEFAULT_SEEDS_REG = {"gcn": 0, "gine": 0, "gatv2": 1}
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # GNN CV
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_gnn_cv_reg(arch, graphs, folds, df, device,
                    name=None, args=None, seed=None, verbose=True):
-    """
-    5-fold CV for one GNN arch × graph rep combination (regression).
-
-    Scaling: StandardScaler fit on train fold only.
-             Metrics computed in original Celsius space.
-
-    Note: graphs must have g.y set before calling. Use _inject_y() or
-    run via run_all_gnn_cv_reg(y=y) which handles injection automatically.
-    """
     name = name or arch.upper()
     args = args or GNN_DEFAULTS_REG[arch]
     seed = seed if seed is not None else GNN_DEFAULT_SEEDS_REG[arch]
@@ -543,9 +455,7 @@ def run_gnn_cv_reg(arch, graphs, folds, df, device,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CLASSICAL CV
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _build_classical_reg(model_name):
     if model_name == "rr":
@@ -567,12 +477,6 @@ def _build_classical_reg(model_name):
 def run_classical_cv_reg(model_name, X, y, folds, df,
                           name=None, verbose=True,
                           tuned_hp=None):
-    """
-    5-fold CV for one classical model × vector rep combination (regression).
-
-    Scaling: StandardScaler on X fit on train fold only.
-             y is raw Celsius — no scaling needed for classical models.
-    """
     name = name or model_name.upper()
 
     if verbose:
@@ -640,24 +544,11 @@ def run_classical_cv_reg(model_name, X, y, folds, df,
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # BATCH RUNNERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run_all_gnn_cv_reg(graph_reps, folds, df, device,
                         y=None, archs=None, verbose=True,
                         hp_dict=None):
-    """
-    Run all GNN arch × graph rep combinations for regression.
-
-    Parameters
-    ----------
-    graph_reps : dict of {rep_name: graph_list}
-    y          : numpy array of Tm values — injected if g.y is None
-    archs      : list — defaults to ["gcn", "gine", "gatv2"]
-    hp_dict    : loaded JSON from best_hp_reg.json (optional)
-                 If provided uses tuned HPs, falls back to defaults.
-    """
     archs   = archs or ["gcn", "gine", "gatv2"]
     results = []
 
@@ -667,10 +558,6 @@ def run_all_gnn_cv_reg(graph_reps, folds, df, device,
             graphs = _inject_y(graphs, y)
 
         rep_key = rep_name.lower().replace("+", "_").replace(" ", "_")
-        # rep_key = (rep_name.lower()
-        #    .replace("+global", "_gl")
-        #    .replace("+", "_")
-        #    .replace(" ", "_"))
 
         for arch in archs:
             hp_key     = f"{arch}_{rep_key}"
@@ -694,16 +581,6 @@ def run_all_gnn_cv_reg(graph_reps, folds, df, device,
 def run_all_classical_cv_reg(vector_reps, y, folds, df,
                               models=None, verbose=True,
                               hp_dict=None):
-    """
-    Run all classical model × vector rep combinations for regression.
-
-    Parameters
-    ----------
-    vector_reps : dict of {rep_name: X_array}
-    y           : numpy array of Tm values in Celsius
-    models      : list — defaults to ["rr", "rf", "xgb"]
-    hp_dict     : loaded JSON from best_hp_reg.json (optional)
-    """
     models  = models or ["rr", "rf", "xgb"]
     results = []
 
@@ -731,14 +608,9 @@ def run_all_classical_cv_reg(vector_reps, y, folds, df,
     return results
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # SUMMARY TABLE
-# ══════════════════════════════════════════════════════════════════════════════
 
 def print_cv_summary_reg(results, sort_by="r2"):
-    """
-    Ranked summary table. Sort by R² descending (or MAE/RMSE ascending).
-    """
     reverse = sort_by == "r2"
     rows = []
     for r in results:

@@ -1,33 +1,15 @@
-"""
-fig2b_cv_barchart.py
-====================
-Figure 2 Panel B — bar chart of top model × representation combinations,
-sorted by mean AUPRC with ± std error bars.
-
-Saved as:
-  fig2b_cv_barchart.pdf
-
-Usage
------
-  python fig2b_cv_barchart.py
-  # or in notebook:
-  %run fig2b_cv_barchart.py
-
-Requires: cv_results.csv (the 27-combo untuned CV results)
-"""
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-# ══════════════════════════════════════════════════════════════════════════════
-# COLORS — change to match your paper palette
-# ══════════════════════════════════════════════════════════════════════════════
+
+# COLORS 
+
 
 # Bar colors by model family
 COLOR_GNN_GRAPH  = "#2C7BB6"   # GNN with graph rep (PBSG/SMILES)
-COLOR_GNN_VECTOR = "#74ADD1"   # GNN with vector rep (if any in top N)
+COLOR_GNN_VECTOR = "#74ADD1"   # GNN with vector rep 
 COLOR_XGB        = "#D7191C"   # XGB
 COLOR_RF         = "#E87E1A"   # RF
 COLOR_LR         = "#F9A653"   # LR/RR
@@ -55,12 +37,11 @@ plt.rcParams.update({
 
 DPI    = 300
 OUTDIR = "Figures"
-TOP_N  = 10   # number of combinations to show — adjust as needed
+TOP_N  = 10  # number of combinations to show — adjust as needed
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# LOAD & PREPARE
-# ══════════════════════════════════════════════════════════════════════════════
+
+# LOAD 
 
 df = pd.read_csv("cv_results_full.csv")
 
@@ -77,9 +58,7 @@ df_top["short_name"] = df_top["name"].str.replace(
 ).str.replace("SMILES+global", "SMILES+gl", regex=False)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PLOT
-# ══════════════════════════════════════════════════════════════════════════════
 
 fig_w = max(6.0, TOP_N * 0.75)
 fig_h = 4.0
