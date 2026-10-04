@@ -2,7 +2,7 @@
 
 Machine-learning pipeline for predicting polymer melting temperature through classification and regression from polymer structure with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
 
-This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation")* and contains
+This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures")* and contains
 the main analysis pipeline.
 
 ---
@@ -111,7 +111,7 @@ Section S5:Quantifying prediction uncertainty arising from stochastic polymer st
 ## Citation
 If you use or reference these models or datasets please reference:
 
-> **Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation.**
+> **Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures.**
 > Maya L. Milrod, Kevin M. Shebek, A. Nolan Wilson, Keith E.-J. Tyo, Eugene Y.-X. Chen, Tobin J. Marks, and Linda J. Broadbelt. *Cell Reports Physical Science*, **2026**.
 
 A DOI will be added upon publication.
