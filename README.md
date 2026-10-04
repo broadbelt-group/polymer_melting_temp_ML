@@ -103,9 +103,9 @@ and `best_hp_reg.json` (regressor). The Optuna search scripts (`optuna_*.py`) ar
 included for full transparency.
 
 **Supplemental Analysis.**
-All code necessary to reproduce supplemental analysis.
-Section S3: Results of an extrapolation stress-test via Butina splitting
-Section S4: Evaluating the impact of stereochemical features on model performance
+All code necessary to reproduce supplemental analysis.\
+Section S3: Results of an extrapolation stress-test via Butina splitting\
+Section S4: Evaluating the impact of stereochemical features on model performance\
 Section S5:Quantifying prediction uncertainty arising from stochastic polymer stereochemical sequence generation
 
 ---
