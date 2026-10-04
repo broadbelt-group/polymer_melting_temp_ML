@@ -9,12 +9,5 @@ __pycache__/
 .venv/
 env/
 
-# Optuna study DBs (tuning history; selected HPs are in best_hp_*.json)
-*.db
-
-# Large/derived caches — uncomment if you prefer users regenerate these
-# */Vectors/
-# */Graphs/
-
 # Local archive (not for publication)
 _archive/

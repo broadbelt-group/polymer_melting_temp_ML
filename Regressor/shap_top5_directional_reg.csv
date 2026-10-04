@@ -1,0 +1,6 @@
+feature,category,mean_abs_shap,value_shap_corr,direction
+Rotatable Bonds,Node Feature,19.792221069335938,-0.8925563685546617,↓ decreases $T_m$
+Flexibility,Node Feature,14.437169075012207,-0.6807981033608211,↓ decreases $T_m$
+LogP,Node Feature,7.333585262298584,-0.5008944702820507,↓ decreases $T_m$
+Pm,Global Feature,7.285685062408447,0.640806962138695,↑ increases $T_m$
+Heteroatoms,Node Feature,6.265864372253418,0.9580743488634138,↑ increases $T_m$
