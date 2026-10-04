@@ -5,7 +5,7 @@ Machine-learning pipeline for predicting polymer melting temperature through cla
 This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures")* and contains
 the main analysis pipeline.
 
-[![DOI](https://zenodo.org)](10.5281/zenodo.23142309)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23142309.svg)](https://doi.org/10.5281/zenodo.23142309)
 
 ---
 
