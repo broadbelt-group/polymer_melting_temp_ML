@@ -1,7 +1,6 @@
 # Polymer Melting Temperature Prediction
 
-Machine-learning pipeline for predicting polymer crystallizability (melting temperature classifier) and
-melting temperature *T*<sub>m</sub> (regressor) from polymer structure with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
+Machine-learning pipeline for predicting polymer melting temperature through classification and regression from polymer structure with a coarse-grained **polymer bead sequence graph ([PBSG](https://github.com/mmilrod/PBSG.git))** representation.
 
 This repository accompanies the manuscript *("Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation")* and contains
 the main analysis pipeline.
@@ -13,9 +12,10 @@ the main analysis pipeline.
 ```
 .
 ├── Raw_Data/                  Source datasets (with references)
-├── Classifier/                Crystallizability (has_Tm) pipeline
+├── Classifier/                has_Tm pipeline
 ├── Final_Models/              Final models and prediction notebook
 ├── Regressor/                 Tm regression pipeline
+├── Supplemental_Analysis/     Code for sections S3-S5
 ├── pbsg.yml                   Conda environment for all notebooks except 06_shap
 ├── shap.yml                   Conda environment for SHAP analysis
 └── README.md
@@ -86,6 +86,9 @@ Both pipelines follow the same stage sequence. Run notebooks in numeric order fr
 | 05 | `05_analysis_figs` | manuscript figures (see provenance table) |
 | 06 | `06_shap` | SHAP values, bar chart, summary CSV — **run in `shap`** |
 
+Note that `sys.path.append(str(Path(PATH TO PBSG)))` needs to be replaced with the path to your copy of PBSG in all relevant files. This can be done easily in VSCode by using the Find+Replace function. This will not be necessary once PBSG is made available on pypi. 
+At the time of publication, it is not yet available on pypi.
+
 **Splits are canonical artifacts.** The `random_stratified_splits_*.json` files
 define the exact train/val/test partitions used for all reported results — load
 these directly to reproduce the paper. `run_random_stratified.py` is the generator
@@ -97,12 +100,19 @@ otherwise produce a different partition.
 and `best_hp_reg.json` (regressor). The Optuna search scripts (`optuna_*.py`) are
 included for full transparency.
 
+**Supplemental Analysis.**
+All code necessary to reproduce supplemental analysis.
+Section S3: Results of an extrapolation stress-test via Butina splitting
+Section S4: Evaluating the impact of stereochemical features on model performance
+Section S5:Quantifying prediction uncertainty arising from stochastic polymer stereochemical sequence generation
+
 ---
 
 ## Citation
+If you use or reference these models or datasets please reference:
 
 > **Stereochemistry-Aware Classification and Regression of Polymer Melting Temperatures Employing Coarse-Grained Representation.**
-> Maya L. Milrod, Kevin M. Shebek, A. Nolan Wilson, Eugene Y.-X. Chen, Tobin J. Marks, and Linda J. Broadbelt.
+> Maya L. Milrod, Kevin M. Shebek, A. Nolan Wilson, Keith E.-J. Tyo, Eugene Y.-X. Chen, Tobin J. Marks, and Linda J. Broadbelt. *Cell Reports Physical Science*, **2026**.
 
 A DOI will be added upon publication.
 
