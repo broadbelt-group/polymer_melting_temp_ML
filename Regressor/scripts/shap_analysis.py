@@ -48,7 +48,7 @@ INTERPRETABLE_ONLY = True
 INTERPRETABLE_CATEGORIES = {"Node Feature", "Global Feature", "Stereochemistry", "Architecture", "Edge"} 
 FIGURE_DIR     = "."
 DPI            = 150
-MAKE_BEESWARM  = False  # set True to generate the beeswarm plot
+MAKE_BEESWARM  = True  # set True to generate the beeswarm plot
 
 CATEGORY_COLORS = {
     "Morgan Fingerprint":   "#2196F3",   # blue
@@ -156,7 +156,7 @@ for i, (bar, name, val) in enumerate(zip(bars, names_rev, values_rev)):
             fontsize=10, fontweight="bold", color="white",
             clip_on=False)
  
-ax.set_xlabel(r"Mean SHAP Value, ($T_m$)", fontsize=11)
+ax.set_xlabel(r"Mean Absolute SHAP Value, ($T_m$)", fontsize=11)
 ax.set_yticks([])                   # hide y-axis ticks — names are on bars
 ax.set_xlim(0, x_max * 1.1)       # give room for outside labels
 
@@ -220,14 +220,14 @@ if MAKE_BEESWARM:
         label_obj.set_color(color)
         label_obj.set_fontweight("bold")
 
-    ax.set_title(f"SHAP Beeswarm — Top {TOP_N} Features", fontsize=13, fontweight="bold")
+    #ax.set_title(f"SHAP Beeswarm — Top {TOP_N} Features", fontsize=13, fontweight="bold")
 
     legend_handles = [
         mpatches.Patch(color=CATEGORY_COLORS.get(c, DEFAULT_COLOR), label=c)
         for c in present_cats
     ]
-    ax.legend(handles=legend_handles, title="Category", fontsize=9,
-              title_fontsize=9, loc="upper right", framealpha=0.9)
+    # ax.legend(handles=legend_handles, title="Category", fontsize=9,
+    #           title_fontsize=9, loc="upper right", framealpha=0.9)
 
     plt.tight_layout()
     beeswarm_path = f"{FIGURE_DIR}/shap_top{TOP_N}_beeswarm.png"
@@ -240,3 +240,83 @@ if MAKE_BEESWARM:
 csv_path = f"{FIGURE_DIR}/shap_top{TOP_N}_summary_reg.csv"
 top5[["feature", "category", "mean_abs_shap"]].to_csv(csv_path, index=False)
 print(f"Saved: {csv_path}")
+
+# ── DIRECTIONAL SHAP (for SI, answers R2 comment 5) ──────────────────────────
+# For each top feature: correlation between feature VALUE and its SHAP value.
+# Positive corr -> higher feature value increases Tm; negative -> decreases Tm.
+
+from scipy.stats import spearmanr
+
+direction_rows = []
+for f in top5_names:
+    j = feature_cols.index(f)
+    fval = X.iloc[:, j].values
+    sval = shap_values_2d[:, j]          # SIGNED shap, not abs
+    # guard against constant features
+    if np.std(fval) < 1e-12:
+        rho, direction = np.nan, "constant"
+    else:
+        rho, _ = spearmanr(fval, sval)
+        direction = "↑ increases $T_m$" if rho > 0 else "↓ decreases $T_m$"
+    direction_rows.append({
+        "feature": DISPLAY_NAMES.get(f, f),
+        "category": feature_categories.get(f, "Other"),
+        "mean_abs_shap": float(sv[:, j].mean()),
+        "value_shap_corr": rho,          # signed: the directionality R2 wants
+        "direction": direction,
+    })
+
+direction_df = pd.DataFrame(direction_rows)
+print("\nDirectional SHAP summary (feature value ↔ SHAP correlation):")
+print(direction_df.to_string(index=False))
+direction_df.to_csv(f"{FIGURE_DIR}/shap_top{TOP_N}_directional_reg.csv", index=False)
+
+# ── DIRECTIONAL BAR — centered at 0, same top-5, same colors ─────────────────
+from scipy.stats import spearmanr
+
+# compute signed direction for each top feature (magnitude = importance)
+signed_vals, colors_ord, labels_ord = [], [], []
+for f in top5_names:
+    j    = feature_cols.index(f)
+    fval = X.iloc[:, j].values
+    sval = shap_values_2d[:, j]
+    imp  = sv[:, j].mean()                       # magnitude = mean|SHAP| (matches main fig)
+    if np.std(fval) < 1e-12:
+        sign = 0.0
+    else:
+        rho, _ = spearmanr(fval, sval)
+        sign = np.sign(rho)
+    signed_vals.append(sign * imp)               # signed length
+    colors_ord.append(CATEGORY_COLORS.get(feature_categories.get(f, "Other"), DEFAULT_COLOR))
+    labels_ord.append(DISPLAY_NAMES.get(f, f))
+
+# reverse so most important is on top
+signed_rev = signed_vals[::-1]
+colors_rev = colors_ord[::-1]
+labels_rev = labels_ord[::-1]
+
+fig, ax = plt.subplots(figsize=(6.5, 4))
+bars = ax.barh(range(TOP_N), signed_rev, color=colors_rev, edgecolor="white", height=0.6)
+
+ax.axvline(0, color="#333333", lw=1)             # zero line
+
+xmax = max(abs(v) for v in signed_rev)
+for i, (val, label) in enumerate(zip(signed_rev, labels_rev)):
+    # place label on the opposite side of the bar direction so it never overlaps
+    if val >= 0:
+        ax.text(-xmax*0.03, i, label, va="center", ha="right",
+                fontsize=10, fontweight="bold", color="#222222", clip_on=False)
+    else:
+        ax.text( xmax*0.03, i, label, va="center", ha="left",
+                fontsize=10, fontweight="bold", color="#222222", clip_on=False)
+
+ax.set_xlim(-xmax*1.25, xmax*1.25)
+ax.set_yticks([])
+ax.set_xlabel(r"Directional SHAP effect (← decreases   |   increases →)", fontsize=11)
+# optional: label the two sides
+# ax.text(0.98, 1.02, "increases $T_m$", transform=ax.transAxes, ha="right", fontsize=9, color="#555")
+# ax.text(0.02, 1.02, "decreases $T_m$", transform=ax.transAxes, ha="left",  fontsize=9, color="#555")
+
+plt.tight_layout()
+plt.savefig(f"{FIGURE_DIR}/shap_top{TOP_N}_directional_centered_reg.png", dpi=DPI, bbox_inches="tight")
+plt.show()

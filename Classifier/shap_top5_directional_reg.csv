@@ -1,0 +1,6 @@
+feature,category,mean_abs_shap,value_shap_corr,direction
+Pm,Global Feature,1.3279004096984863,0.5633534567709936,↑ increases $T_m$
+Backbone Length,Node Feature,0.7411678433418274,0.5259971519940906,↑ increases $T_m$
+Kier Flexibility,Node Feature,0.4737905263900757,0.8150959488784545,↑ increases $T_m$
+LogP,Node Feature,0.43312588334083557,-0.8787012045063077,↓ decreases $T_m$
+Branch Length,Node Feature,0.339364618062973,-0.7413602847014492,↓ decreases $T_m$
